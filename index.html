@@ -15,7 +15,7 @@
             color: #000;
         }
 
-        /* CONTENEDOR TAMAÑO CARTA (Hoja de papel) */
+        /* CONTENEDOR TAMAÑO CARTA */
         #documento-pdf {
             background-color: #fff;
             width: 21.59cm;
@@ -50,12 +50,7 @@
         h4 { font-size: 10pt; margin: 0 0 10px 0; text-decoration: none; font-weight: bold; text-transform: uppercase; }
 
         /* MARCOS DE SECCIÓN */
-        .section-frame {
-            border: 1px solid #000;
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-        }
+        .section-frame { border: 1px solid #000; padding: 12px 15px; margin-bottom: 15px; box-sizing: border-box; }
 
         /* CAMPOS DE FORMULARIO */
         .row { margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: flex-end; font-size: 9pt; font-weight: bold;}
@@ -63,18 +58,10 @@
         .inline-field-grow { flex-grow: 1; display: flex; align-items: flex-end; }
         
         input[type="text"], input[type="number"], input[type="email"] {
-            border: none;
-            border-bottom: 1px solid #000;
-            background-color: #fff9c4;
-            font-family: Arial, sans-serif;
-            font-size: 9pt;
-            font-weight: normal;
-            padding: 2px 5px;
-            outline: none;
-            flex-grow: 1;
-            text-transform: uppercase;
-            margin-left: 5px;
-            color: #000;
+            border: none; border-bottom: 1px solid #000; background-color: #fff9c4;
+            font-family: Arial, sans-serif; font-size: 9pt; font-weight: normal;
+            padding: 2px 5px; outline: none; flex-grow: 1; text-transform: uppercase;
+            margin-left: 5px; color: #000;
         }
         
         .w-rfc { width: 120px; flex-grow: 0 !important; }
@@ -88,15 +75,10 @@
         /* SECCIÓN DE FIRMA */
         .signature-section { text-align: center; margin-top: 30px; font-size: 9pt; font-weight: bold; }
         #canvas-firma { 
-            border: 0;
-            border-bottom: 1px solid #000; 
+            border: 1px dashed #999; /* Borde punteado para guiar en pantalla */
             background-color: #fff9c4; 
-            display: block; 
-            margin: 0 auto 5px auto; 
-            cursor: crosshair; 
-            touch-action: none;
-            width: 300px;
-            height: 80px;
+            display: block; margin: 0 auto 5px auto; cursor: crosshair; touch-action: none;
+            width: 300px; height: 80px;
         }
         .signature-name { width: 350px; margin: 0 auto; line-height: 1.2; text-transform: uppercase; }
 
@@ -107,10 +89,11 @@
         .map-container { margin-top: 20px; text-align: center; width: 100%; height: 500px; border: 1px solid #000; background: #eee;}
         iframe { width: 100%; height: 100%; border: 0; }
 
-        /* INTERFAZ MÓVIL */
+        /* INTERFAZ MÓVIL (BOTONES) */
         .controls { text-align: center; margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        button { padding: 12px 20px; font-size: 14px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; color: white; font-weight: bold; width: 90%; max-width: 300px;}
+        button { padding: 10px 15px; font-size: 13px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; color: white; font-weight: bold; width: 90%; max-width: 250px;}
         .btn-gps { background-color: #2e7d32; }
+        .btn-manual { background-color: #d35400; }
         .btn-limpiar { background-color: #546e7a; }
         .btn-pdf { background-color: #c62828; }
 
@@ -128,31 +111,18 @@
         @media print {
             @page { size: letter; margin: 0; }
             body { background-color: transparent; padding: 0; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
-            
-            #documento-pdf { 
-                width: 21.59cm; 
-                min-height: 27.94cm; 
-                box-shadow: none; 
-                padding: 1.5cm 2cm; 
-                margin: 0; 
-                border: none;
-                page-break-after: auto;
-            }
-            
+            #documento-pdf { width: 21.59cm; min-height: 27.94cm; box-shadow: none; padding: 1.5cm 2cm; margin: 0; border: none; page-break-after: auto; }
             .controls { display: none !important; }
             input[type="text"], input[type="number"], input[type="email"] { background-color: transparent !important; }
-            #canvas-firma { background-color: transparent !important; }
-            
+            #canvas-firma { background-color: transparent !important; border: none !important; } /* Oculta el borde punteado en el PDF */
             .row { flex-direction: row !important; align-items: flex-end !important; }
             .inline-field, .inline-field-grow { width: auto !important; margin-bottom: 0 !important; }
             .w-rfc { width: 120px !important; }
             .w-small { width: 60px !important; }
             .w-med { width: 150px !important; }
-            
             .exclusive-box { float: right !important; width: 220px !important; margin-top: 0 !important; }
             .header-table td { display: table-cell !important; text-align: left !important; }
             .banner-img { margin: 0; max-width: 500px !important; }
-            
             .page-break { page-break-before: always; }
         }
     </style>
@@ -160,7 +130,8 @@
 <body>
 
     <div class="controls" id="botones-control">
-        <button class="btn-gps" onclick="obtenerGPS()">📍 Obtener Coordenadas y Mapa</button>
+        <button class="btn-gps" onclick="obtenerGPS()">📍 Obtener Mi Ubicación Actual</button>
+        <button class="btn-manual" onclick="actualizarMapaManual()">🗺️ Cargar Mapa desde Coordenadas</button>
         <button class="btn-limpiar" onclick="limpiarFirma()">🧹 Borrar Firma</button>
         <button class="btn-pdf" onclick="generarPDF()">📄 Guardar Documento Oficial (PDF)</button>
     </div>
@@ -175,7 +146,7 @@
                     <div class="exclusive-box">
                         USO EXCLUSIVO DEL SENASICA<br>
                         NÚMERO DE REGISTRO:<br><br>
-                        VERIFICACIÓN [<input type="checkbox">] &nbsp;&nbsp; CERTIFICACIÓN [<input type="checkbox">]
+                        VERIFICACIÓN [<input type="checkbox">]    CERTIFICACIÓN [<input type="checkbox">]
                     </div>
                 </td>
             </tr>
@@ -195,7 +166,7 @@
         <div class="section-frame">
             <h4>DATOS GENERALES:</h4>
             <div class="row">
-                <div class="inline-field">1. PERSONA FÍSICA (<input type="checkbox">) &nbsp;&nbsp; PERSONA MORAL (<input type="checkbox">)</div>
+                <div class="inline-field">1. PERSONA FÍSICA (<input type="checkbox">)    PERSONA MORAL (<input type="checkbox">)</div>
                 <div class="inline-field-grow">RFC: <input type="text" class="w-rfc" maxlength="13"></div>
             </div>
             <div class="row">
@@ -224,7 +195,7 @@
                 <div class="inline-field">TELÉFONO: <input type="text" class="w-med"></div>
             </div>
             <div class="row">
-                <div class="inline-field">2. UBICACIÓN &nbsp;&nbsp; CALLE: <input type="text" class="w-med"></div>
+                <div class="inline-field">2. UBICACIÓN    CALLE: <input type="text" class="w-med"></div>
                 <div class="inline-field">NÚMERO: <input type="text" class="w-small"></div>
                 <div class="inline-field-grow">LOCALIDAD O COLONIA: <input type="text"></div>
             </div>
@@ -235,10 +206,12 @@
                 <div class="inline-field-grow">CORREO ELECTRÓNICO: <input type="email" style="text-transform: lowercase;"></div>
             </div>
             <div class="row" style="margin-top: 20px;">
-                <div class="inline-field-grow"><strong>GEORREFERENCIACIÓN</strong> &nbsp;&nbsp;&nbsp; LATITUD DE LA UNIDAD DE PRODUCCIÓN: <input type="text" id="latitud_longitud" style="text-align: center; color: #000;"></div>
+                <div class="inline-field-grow"><strong>GEORREFERENCIACIÓN</strong>     LATITUD DE LA UNIDAD DE PRODUCCIÓN: 
+                    <input type="text" id="latitud_longitud" style="text-align: center; color: #000;" placeholder="Ej. 25.910650, -109.342458">
+                </div>
             </div>
             <div class="row" style="margin-top: 15px;">
-                <div class="inline-field">DESTINO: &nbsp;&nbsp; NACIONAL (<input type="checkbox">) &nbsp;&nbsp; EXPORTACIÓN (<input type="checkbox" checked>)</div>
+                <div class="inline-field">DESTINO:    NACIONAL (<input type="checkbox">)    EXPORTACIÓN (<input type="checkbox" checked>)</div>
             </div>
             <div class="row">
                 <div class="inline-field-grow">3. PRODUCTO (S) Y VARIEDAD (S): <span style="font-weight: normal; margin-left: 5px;">Sorghum bicolor (L.)</span></div>
@@ -259,11 +232,18 @@
         </div>
 
         <div class="signature-section">
-            <canvas id="canvas-firma"></canvas>
             BAJO PROTESTA DE DECIR VERDAD<br><br>
-            <div class="signature-line">
+            
+            <canvas id="canvas-firma"></canvas>
+            
+            <div style="display: flex; justify-content: center; margin-bottom: 5px;">
+                <input type="text" placeholder="TECLEA EL NOMBRE AQUÍ" style="width: 300px; text-align: center; font-weight: bold; font-size: 10pt; margin-left: 0;">
+            </div>
+            
+            <div class="signature-name" style="width: 300px;">
                 NOMBRE Y FIRMA DEL PROPIETARIO<br>O REPRESENTANTE LEGAL
             </div>
+            
             <div class="row" style="justify-content: center; margin-top: 20px;">
                 <div class="inline-field">LUGAR Y FECHA: <input type="text" style="width: 350px; text-align: center;"></div>
             </div>
@@ -280,7 +260,7 @@
             <h4 style="text-align: center;">ANEXO: UBICACIÓN SATELITAL</h4>
             <div class="map-container" id="mapa-iframe">
                 <p style="text-align: center; color: #666; margin-top: 200px; font-weight: normal; font-size: 10pt;">
-                    <em>El mapa satelital se cargará aquí al presionar el botón de "Obtener Coordenadas".</em>
+                    <em>El mapa satelital se cargará aquí al presionar uno de los botones de coordenadas.</em>
                 </p>
             </div>
         </div>
@@ -325,16 +305,14 @@
 
         function limpiarFirma() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-        // GPS y Mapa
+        // Función 1: Obtener GPS del dispositivo
         function obtenerGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
                     const lat = pos.coords.latitude;
                     const lon = pos.coords.longitude;
                     document.getElementById('latitud_longitud').value = `${lat}, ${lon}`;
-                    
-                    const urlMapa = `https://maps.google.com/maps?q=${lat},${lon}&hl=es&z=17&t=k&output=embed`;
-                    document.getElementById('mapa-iframe').innerHTML = `<iframe src="${urlMapa}" frameborder="0"></iframe>`;
+                    cargarIframeMapa(lat, lon);
                     alert("¡Ubicación y mapa cargados exitosamente!");
                 }, () => {
                     alert("Por favor, asegúrate de tener el GPS activado y dar permisos al navegador.");
@@ -342,6 +320,29 @@
             } else {
                 alert("Tu dispositivo no soporta geolocalización.");
             }
+        }
+
+        // Función 2: Cargar mapa leyendo lo que el usuario escribió en el campo de texto
+        function actualizarMapaManual() {
+            const inputCoords = document.getElementById('latitud_longitud').value;
+            
+            if (!inputCoords || !inputCoords.includes(',')) {
+                alert("Por favor, escribe primero las coordenadas en el campo de Georreferenciación.\nFormato: Latitud, Longitud\nEjemplo: 25.910650, -109.342458");
+                return;
+            }
+
+            const partes = inputCoords.split(',');
+            const lat = partes[0].trim();
+            const lon = partes[1].trim();
+
+            cargarIframeMapa(lat, lon);
+            alert("¡Mapa actualizado con las coordenadas que ingresaste!");
+        }
+
+        // Función centralizada para mostrar el mapa satelital de Google
+        function cargarIframeMapa(lat, lon) {
+            const urlMapa = `https://maps.google.com/maps?q=${lat},${lon}&t=k&z=17&output=embed`;
+            document.getElementById('mapa-iframe').innerHTML = `<iframe src="${urlMapa}" frameborder="0"></iframe>`;
         }
 
         // Impresión a PDF Nativa
