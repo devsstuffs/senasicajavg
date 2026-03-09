@@ -75,7 +75,7 @@
         /* SECCIÓN DE FIRMA */
         .signature-section { text-align: center; margin-top: 30px; font-size: 9pt; font-weight: bold; }
         #canvas-firma { 
-            border: 1px dashed #999; /* Borde punteado para guiar en pantalla */
+            border: 1px dashed #999; 
             background-color: #fff9c4; 
             display: block; margin: 0 auto 5px auto; cursor: crosshair; touch-action: none;
             width: 300px; height: 80px;
@@ -114,7 +114,7 @@
             #documento-pdf { width: 21.59cm; min-height: 27.94cm; box-shadow: none; padding: 1.5cm 2cm; margin: 0; border: none; page-break-after: auto; }
             .controls { display: none !important; }
             input[type="text"], input[type="number"], input[type="email"] { background-color: transparent !important; }
-            #canvas-firma { background-color: transparent !important; border: none !important; } /* Oculta el borde punteado en el PDF */
+            #canvas-firma { background-color: transparent !important; border: none !important; } 
             .row { flex-direction: row !important; align-items: flex-end !important; }
             .inline-field, .inline-field-grow { width: auto !important; margin-bottom: 0 !important; }
             .w-rfc { width: 120px !important; }
@@ -145,7 +145,9 @@
                 <td style="width: 35%; vertical-align: top;">
                     <div class="exclusive-box">
                         USO EXCLUSIVO DEL SENASICA<br>
-                        NÚMERO DE REGISTRO:<br><br>
+                        <div style="margin-top: 5px; margin-bottom: 5px; display: flex; align-items: flex-end;">
+                            NÚMERO DE REGISTRO: <input type="text" style="width: 80px; margin-left: 5px; font-weight: bold;">
+                        </div>
                         VERIFICACIÓN [<input type="checkbox">]    CERTIFICACIÓN [<input type="checkbox">]
                     </div>
                 </td>
@@ -170,7 +172,7 @@
                 <div class="inline-field-grow">RFC: <input type="text" class="w-rfc" maxlength="13"></div>
             </div>
             <div class="row">
-                <div class="inline-field-grow">2. NOMBRE DEL PROPIETARIO O REPRESENTANTE LEGAL: <input type="text"></div>
+                <div class="inline-field-grow">2. NOMBRE DEL PROPIETARIO O REPRESENTANTE LEGAL: <input type="text" id="nombre-arriba"></div>
             </div>
             <div class="row">
                 <div class="inline-field">3. DOMICILIO: CALLE: <input type="text" class="w-med"></div>
@@ -237,7 +239,7 @@
             <canvas id="canvas-firma"></canvas>
             
             <div style="display: flex; justify-content: center; margin-bottom: 5px;">
-                <input type="text" placeholder="TECLEA EL NOMBRE AQUÍ" style="width: 300px; text-align: center; font-weight: bold; font-size: 10pt; margin-left: 0;">
+                <input type="text" id="nombre-firma" placeholder="TECLEA EL NOMBRE AQUÍ" style="width: 300px; text-align: center; font-weight: bold; font-size: 10pt; margin-left: 0;">
             </div>
             
             <div class="signature-name" style="width: 300px;">
@@ -268,6 +270,18 @@
     </div>
 
     <script>
+        // Sincronizar el nombre de arriba con el de la firma automáticamente
+        const inputNombreArriba = document.getElementById('nombre-arriba');
+        const inputNombreFirma = document.getElementById('nombre-firma');
+
+        inputNombreArriba.addEventListener('input', function() {
+            inputNombreFirma.value = this.value;
+        });
+
+        inputNombreFirma.addEventListener('input', function() {
+            inputNombreArriba.value = this.value;
+        });
+
         // Funciones de dibujo de firma
         const canvas = document.getElementById('canvas-firma');
         const ctx = canvas.getContext('2d');
