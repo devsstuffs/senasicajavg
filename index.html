@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviso de Inicio de Funcionamiento - SENASICA</title>
+    <style>
+        /* CONFIGURACIÓN GENERAL PARA PANTALLA Y CELULAR */
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+            font-size: 10pt;
+            color: #000;
+        }
+
+        /* CONTENEDOR TAMAÑO CARTA (Hoja de papel) */
+        #documento-pdf {
+            background-color: #fff;
+            width: 21.59cm;
+            min-height: 27.94cm;
+            margin: 0 auto;
+            padding: 1.5cm 2cm;
+            box-sizing: border-box;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        /* ENCABEZADO OFICIAL (CON IMAGEN) */
+        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        .header-table td { vertical-align: middle; padding: 0; }
+        
+        .banner-img { width: 100%; max-width: 550px; display: block; height: auto; }
+        
+        .exclusive-box { 
+            border: 1px solid #000; 
+            padding: 6px; 
+            width: 220px; 
+            float: right; 
+            font-size: 8pt; 
+            text-align: left;
+            font-weight: bold;
+            box-sizing: border-box;
+        }
+
+        /* TEXTOS Y PÁRRAFOS */
+        .director-name { text-align: center; font-weight: bold; font-size: 10pt; margin: 10px 0 20px 0; line-height: 1.2; }
+        p.legal-text { text-align: justify; font-size: 8.5pt; line-height: 1.5; margin-bottom: 20px; text-transform: uppercase; }
+        h4 { font-size: 10pt; margin: 0 0 10px 0; text-decoration: none; font-weight: bold; text-transform: uppercase; }
+
+        /* MARCOS DE SECCIÓN */
+        .section-frame {
+            border: 1px solid #000;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        /* CAMPOS DE FORMULARIO */
+        .row { margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: flex-end; font-size: 9pt; font-weight: bold;}
+        .inline-field { display: flex; align-items: flex-end; white-space: nowrap; margin-right: 15px; }
+        .inline-field-grow { flex-grow: 1; display: flex; align-items: flex-end; }
+        
+        input[type="text"], input[type="number"], input[type="email"] {
+            border: none;
+            border-bottom: 1px solid #000;
+            background-color: #fff9c4;
+            font-family: Arial, sans-serif;
+            font-size: 9pt;
+            font-weight: normal;
+            padding: 2px 5px;
+            outline: none;
+            flex-grow: 1;
+            text-transform: uppercase;
+            margin-left: 5px;
+            color: #000;
+        }
+        
+        .w-rfc { width: 120px; flex-grow: 0 !important; }
+        .w-small { width: 60px; flex-grow: 0 !important; }
+        .w-med { width: 150px; flex-grow: 0 !important; }
+
+        /* CASILLAS DE VERIFICACIÓN */
+        .check-box { font-weight: normal; margin: 0 5px; font-size: 10pt; }
+        input[type="checkbox"] { transform: scale(1.3); margin: 0 5px; cursor: pointer; accent-color: #000; }
+
+        /* SECCIÓN DE FIRMA */
+        .signature-section { text-align: center; margin-top: 30px; font-size: 9pt; font-weight: bold; }
+        #canvas-firma { 
+            border: 0;
+            border-bottom: 1px solid #000; 
+            background-color: #fff9c4; 
+            display: block; 
+            margin: 0 auto 5px auto; 
+            cursor: crosshair; 
+            touch-action: none;
+            width: 300px;
+            height: 80px;
+        }
+        .signature-name { width: 350px; margin: 0 auto; line-height: 1.2; text-transform: uppercase; }
+
+        /* PIE DE PÁGINA */
+        .footer-text { font-size: 6.5pt; text-align: justify; margin-top: 30px; line-height: 1.2; color: #333; }
+
+        /* SEGUNDA PÁGINA Y MAPA */
+        .map-container { margin-top: 20px; text-align: center; width: 100%; height: 500px; border: 1px solid #000; background: #eee;}
+        iframe { width: 100%; height: 100%; border: 0; }
+
+        /* INTERFAZ MÓVIL */
+        .controls { text-align: center; margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        button { padding: 12px 20px; font-size: 14px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; color: white; font-weight: bold; width: 90%; max-width: 300px;}
+        .btn-gps { background-color: #2e7d32; }
+        .btn-limpiar { background-color: #546e7a; }
+        .btn-pdf { background-color: #c62828; }
+
+        @media (max-width: 768px) {
+            #documento-pdf { width: 100%; padding: 15px; box-shadow: none; }
+            .row { flex-direction: column; align-items: flex-start; }
+            .inline-field, .inline-field-grow { width: 100%; margin-right: 0; margin-bottom: 8px; }
+            input[type="text"], input[type="number"], input[type="email"] { width: 100%; }
+            .exclusive-box { float: none; width: 100%; margin-top: 15px; }
+            .header-table td { display: block; width: 100% !important; text-align: center; margin-bottom: 10px; }
+            .banner-img { margin: 0 auto; }
+        }
+
+        /* IMPRESIÓN / GUARDADO PDF NATIVO */
+        @media print {
+            @page { size: letter; margin: 0; }
+            body { background-color: transparent; padding: 0; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
+            
+            #documento-pdf { 
+                width: 21.59cm; 
+                min-height: 27.94cm; 
+                box-shadow: none; 
+                padding: 1.5cm 2cm; 
+                margin: 0; 
+                border: none;
+                page-break-after: auto;
+            }
+            
+            .controls { display: none !important; }
+            input[type="text"], input[type="number"], input[type="email"] { background-color: transparent !important; }
+            #canvas-firma { background-color: transparent !important; }
+            
+            .row { flex-direction: row !important; align-items: flex-end !important; }
+            .inline-field, .inline-field-grow { width: auto !important; margin-bottom: 0 !important; }
+            .w-rfc { width: 120px !important; }
+            .w-small { width: 60px !important; }
+            .w-med { width: 150px !important; }
+            
+            .exclusive-box { float: right !important; width: 220px !important; margin-top: 0 !important; }
+            .header-table td { display: table-cell !important; text-align: left !important; }
+            .banner-img { margin: 0; max-width: 500px !important; }
+            
+            .page-break { page-break-before: always; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls" id="botones-control">
+        <button class="btn-gps" onclick="obtenerGPS()">📍 Obtener Coordenadas y Mapa</button>
+        <button class="btn-limpiar" onclick="limpiarFirma()">🧹 Borrar Firma</button>
+        <button class="btn-pdf" onclick="generarPDF()">📄 Guardar Documento Oficial (PDF)</button>
+    </div>
+
+    <div id="documento-pdf">
+        <table class="header-table">
+            <tr>
+                <td style="width: 65%;">
+                    <img src="image_da5ed5.png" alt="Banner SENASICA" class="banner-img">
+                </td>
+                <td style="width: 35%; vertical-align: top;">
+                    <div class="exclusive-box">
+                        USO EXCLUSIVO DEL SENASICA<br>
+                        NÚMERO DE REGISTRO:<br><br>
+                        VERIFICACIÓN [<input type="checkbox">] &nbsp;&nbsp; CERTIFICACIÓN [<input type="checkbox">]
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="director-name" style="margin-top: -10px;">
+            AVISO DE INICIO DE FUNCIONAMIENTO<br><br>
+            M.B. FRANCISCO RAMÍREZ Y RAMÍREZ<br>
+            DIRECTOR GENERAL DE SANIDAD VEGETAL
+        </div>
+
+        <p class="legal-text">
+            EN CUMPLIMIENTO A LO DISPUESTO EN LOS ARTÍCULOS 7 FRACCIÓN XIX, 19 FRACCIONES I, INCISOS, F, G, K, M; Y VII, 37 BIS DE LA LEY FEDERAL DE SANIDAD VEGETAL; 91, 110, 111 Y 112 DEL REGLAMENTO DE LA LEY FEDERAL DE SANIDAD VEGETAL, PRESENTO EL AVISO DE INICIO DE FUNCIONAMIENTO DEL ESTABLECIMIENTO O DE LA UNIDAD DE PRODUCCIÓN COMERCIAL: 
+            <input type="text" style="width: 200px; text-align: center;">, CUYOS DATOS SE MENCIONAN A CONTINUACIÓN:
+        </p>
+
+        <div class="section-frame">
+            <h4>DATOS GENERALES:</h4>
+            <div class="row">
+                <div class="inline-field">1. PERSONA FÍSICA (<input type="checkbox">) &nbsp;&nbsp; PERSONA MORAL (<input type="checkbox">)</div>
+                <div class="inline-field-grow">RFC: <input type="text" class="w-rfc" maxlength="13"></div>
+            </div>
+            <div class="row">
+                <div class="inline-field-grow">2. NOMBRE DEL PROPIETARIO O REPRESENTANTE LEGAL: <input type="text"></div>
+            </div>
+            <div class="row">
+                <div class="inline-field">3. DOMICILIO: CALLE: <input type="text" class="w-med"></div>
+                <div class="inline-field">NÚMERO: <input type="text" class="w-small"></div>
+                <div class="inline-field-grow">LOCALIDAD O COLONIA: <input type="text"></div>
+            </div>
+            <div class="row">
+                <div class="inline-field-grow">MUNICIPIO: <input type="text"></div>
+                <div class="inline-field-grow">ESTADO: <input type="text"></div>
+                <div class="inline-field">C.P.: <input type="number" class="w-small"></div>
+                <div class="inline-field">TELÉFONO: <input type="text" class="w-med"></div>
+            </div>
+            <div class="row">
+                <div class="inline-field-grow">CORREO ELECTRÓNICO: <input type="email" style="text-transform: lowercase;"></div>
+            </div>
+        </div>
+
+        <div class="section-frame">
+            <h4>DATOS DEL ESTABLECIMIENTO O UNIDAD DE PRODUCCIÓN COMERCIAL:</h4>
+            <div class="row">
+                <div class="inline-field-grow">1. NOMBRE O RAZÓN SOCIAL: <input type="text"></div>
+                <div class="inline-field">TELÉFONO: <input type="text" class="w-med"></div>
+            </div>
+            <div class="row">
+                <div class="inline-field">2. UBICACIÓN &nbsp;&nbsp; CALLE: <input type="text" class="w-med"></div>
+                <div class="inline-field">NÚMERO: <input type="text" class="w-small"></div>
+                <div class="inline-field-grow">LOCALIDAD O COLONIA: <input type="text"></div>
+            </div>
+            <div class="row">
+                <div class="inline-field-grow">MUNICIPIO: <input type="text"></div>
+                <div class="inline-field-grow">ESTADO: <input type="text"></div>
+                <div class="inline-field">C.P.: <input type="number" class="w-small"></div>
+                <div class="inline-field-grow">CORREO ELECTRÓNICO: <input type="email" style="text-transform: lowercase;"></div>
+            </div>
+            <div class="row" style="margin-top: 20px;">
+                <div class="inline-field-grow"><strong>GEORREFERENCIACIÓN</strong> &nbsp;&nbsp;&nbsp; LATITUD DE LA UNIDAD DE PRODUCCIÓN: <input type="text" id="latitud_longitud" style="text-align: center; color: #000;"></div>
+            </div>
+            <div class="row" style="margin-top: 15px;">
+                <div class="inline-field">DESTINO: &nbsp;&nbsp; NACIONAL (<input type="checkbox">) &nbsp;&nbsp; EXPORTACIÓN (<input type="checkbox" checked>)</div>
+            </div>
+            <div class="row">
+                <div class="inline-field-grow">3. PRODUCTO (S) Y VARIEDAD (S): <span style="font-weight: normal; margin-left: 5px;">Sorghum bicolor (L.)</span></div>
+            </div>
+            <div class="row">
+                <div class="inline-field-grow">4. PLAGA (S) OBJETIVO: <span style="font-weight: normal; margin-left: 5px;">LAS INDICADAS EN EL PROTOCOLO DE EXPORTACIÓN DE SORGO A CHINA.</span></div>
+            </div>
+            <div class="row">
+                <div class="inline-field-grow">5. MEDIDA (S) FITOSANITARIA (S): <span style="font-weight: normal; margin-left: 5px;">LAS INDICADAS EN EL PROTOCOLO Y MANUAL DE EXPORTACIÓN DE SORGO A CHINA.</span></div>
+            </div>
+            <div class="row">
+                <div class="inline-field-grow">6. ORIGEN DEL PRODUCTO VEGETAL: <input type="text"></div>
+            </div>
+            <div class="row">
+                <div class="inline-field">7. ÁREA, SUPERFICIE O CAPACIDAD: <input type="number" step="0.01" class="w-small"></div>
+                <div class="inline-field-grow">VOLUMEN APROXIMADO DE PRODUCCIÓN: <input type="number" class="w-small"> TON</div>
+            </div>
+        </div>
+
+        <div class="signature-section">
+            <canvas id="canvas-firma"></canvas>
+            BAJO PROTESTA DE DECIR VERDAD<br><br>
+            <div class="signature-line">
+                NOMBRE Y FIRMA DEL PROPIETARIO<br>O REPRESENTANTE LEGAL
+            </div>
+            <div class="row" style="justify-content: center; margin-top: 20px;">
+                <div class="inline-field">LUGAR Y FECHA: <input type="text" style="width: 350px; text-align: center;"></div>
+            </div>
+        </div>
+
+        <div class="footer-text">
+            ORIGINAL: INTERESADO, C.C.P. SUBDIRECCIÓN DE REGULACIÓN NACIONAL.<br>
+            ANEXAR IMÁGENES DEL ESTABLECIMIENTO AL REVERSO DE LA HOJA. LA AUTORIDAD SE RESERVA EL DERECHO DE REALIZAR VISITAS DE SUPERVISIÓN.<br><br>
+            EN CUMPLIMIENTO DE LA LEY FEDERAL DE PROTECCIÓN DE DATOS PERSONALES EN POSESIÓN DE LOS PARTICULARES Y SU REGLAMENTO, EL SENASICA, CON DOMICILIO EN BOULEVARD ADOLFO RUIZ CORTINES NO. 5010, COL INSURGENTES CUICUILCO, DELEGACIÓN COYOACAN, CIUDAD DE MÉXICO, C.P. 04530, ES RESPONSABLE DE RECABAR SUS DATOS PERSONALES, DEL USO QUE SE LE DE A LOS MISMOS Y DE SU PROTECCIÓN, EL AVISO DE PRIVACIDAD DEL SENASICA SE PUEDE CONSULTAR EN: https://www.gob.mx/senasica
+        </div>
+
+        <div class="page-break"></div>
+        <div style="margin-top: 2cm;">
+            <h4 style="text-align: center;">ANEXO: UBICACIÓN SATELITAL</h4>
+            <div class="map-container" id="mapa-iframe">
+                <p style="text-align: center; color: #666; margin-top: 200px; font-weight: normal; font-size: 10pt;">
+                    <em>El mapa satelital se cargará aquí al presionar el botón de "Obtener Coordenadas".</em>
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Funciones de dibujo de firma
+        const canvas = document.getElementById('canvas-firma');
+        const ctx = canvas.getContext('2d');
+        let dibujando = false;
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.strokeStyle = '#000000';
+        }
+        window.addEventListener('load', resizeCanvas);
+
+        function obtenerPosicion(e) {
+            const rect = canvas.getBoundingClientRect();
+            let x = e.clientX || (e.touches && e.touches[0].clientX);
+            let y = e.clientY || (e.touches && e.touches[0].clientY);
+            return { x: x - rect.left, y: y - rect.top };
+        }
+
+        function iniciarDibujo(e) { e.preventDefault(); dibujando = true; const pos = obtenerPosicion(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); }
+        function dibujar(e) { if (!dibujando) return; e.preventDefault(); const pos = obtenerPosicion(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
+        function detenerDibujo() { dibujando = false; }
+
+        canvas.addEventListener('mousedown', iniciarDibujo);
+        canvas.addEventListener('mousemove', dibujar);
+        canvas.addEventListener('mouseup', detenerDibujo);
+        canvas.addEventListener('mouseout', detenerDibujo);
+        canvas.addEventListener('touchstart', iniciarDibujo, {passive: false});
+        canvas.addEventListener('touchmove', dibujar, {passive: false});
+        canvas.addEventListener('touchend', detenerDibujo);
+
+        function limpiarFirma() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+        // GPS y Mapa
+        function obtenerGPS() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    document.getElementById('latitud_longitud').value = `${lat}, ${lon}`;
+                    
+                    const urlMapa = `https://maps.google.com/maps?q=${lat},${lon}&hl=es&z=17&t=k&output=embed`;
+                    document.getElementById('mapa-iframe').innerHTML = `<iframe src="${urlMapa}" frameborder="0"></iframe>`;
+                    alert("¡Ubicación y mapa cargados exitosamente!");
+                }, () => {
+                    alert("Por favor, asegúrate de tener el GPS activado y dar permisos al navegador.");
+                });
+            } else {
+                alert("Tu dispositivo no soporta geolocalización.");
+            }
+        }
+
+        // Impresión a PDF Nativa
+        function generarPDF() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
