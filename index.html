@@ -15,7 +15,7 @@
         .seccion-titulo { font-weight: bold; font-size: 14px; margin-bottom: 10px; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
         
         label { font-weight: bold; margin-top: 10px; display: block; font-size: 12px; color: #333; }
-        input[type="text"], input[type="number"], input[type="email"] { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #aaa; border-radius: 4px; box-sizing: border-box; text-transform: uppercase; font-size: 13px; }
+        input[type="text"], input[type="number"], input[type="email"] { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #aaa; border-radius: 4px; box-sizing: border-box; text-transform: uppercase; font-size: 13px; background: #fff;}
         input[type="email"] { text-transform: lowercase; }
         
         .fila { display: flex; gap: 10px; }
@@ -26,6 +26,10 @@
 
         #canvas-firma { border: 2px dashed #621132; background-color: #fff; width: 100%; height: 120px; margin-top: 10px; touch-action: none; cursor: crosshair; }
         
+        /* Contenedor del mapa en vivo */
+        .mapa-en-vivo { width: 100%; height: 300px; border: 1px solid #ccc; border-radius: 5px; background: #eee; margin-top: 15px; text-align: center; display: none; overflow: hidden;}
+        .mapa-en-vivo iframe { width: 100%; height: 100%; border: 0; }
+
         button { width: 100%; padding: 12px; font-size: 15px; margin-top: 10px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; }
         .btn-gps { background-color: #2e7d32; }
         .btn-limpiar { background-color: #7f8c8d; }
@@ -36,7 +40,7 @@
 
     <div class="contenedor">
         <h2>Formato SENASICA</h2>
-        <p class="instrucciones">Llena los datos a continuación. Al terminar, presionar "Generar Documento" para ver el PDF.</p>
+        <p class="instrucciones">Llena los datos a continuación. Al presionar "Generar Documento", se estamparán perfectamente sobre el PDF original.</p>
 
         <div class="seccion">
             <div class="seccion-titulo">DATOS DE CABECERA</div>
@@ -102,12 +106,15 @@
 
             <label style="margin-top: 15px; color: #2e7d32;">Ubicación Satelital (Georreferenciación):</label>
             <div class="fila">
-                <div><input type="text" id="latitud" placeholder="Latitud"></div>
-                <div><input type="text" id="longitud" placeholder="Longitud"></div>
+                <div><input type="text" id="latitud" placeholder="Latitud (Ej. 25.9106)"></div>
+                <div><input type="text" id="longitud" placeholder="Longitud (Ej. -109.3424)"></div>
             </div>
             <button class="btn-gps" onclick="obtenerGPS()">📍 Obtener Coordenadas Actuales</button>
 
-            <div class="checkbox-group" style="margin-top:10px;">
+            <div id="vista-mapa" class="mapa-en-vivo">
+                </div>
+
+            <div class="checkbox-group" style="margin-top:15px;">
                 <label><input type="checkbox" id="chk_nacional"> Destino Nacional</label>
                 <label><input type="checkbox" id="chk_exportacion" checked> Destino Exportación</label>
             </div>
@@ -134,7 +141,7 @@
     </div>
 
     <script>
-        // --- 1. LÓGICA DE FIRMA ---
+        // --- LÓGICA DE FIRMA ---
         const canvas = document.getElementById('canvas-firma');
         const ctx = canvas.getContext('2d');
         let dibujando = false;
@@ -164,33 +171,49 @@
 
         function limpiarFirma() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-        // --- 2. LÓGICA DE GPS ---
+        // --- LÓGICA DE MAPA EN VIVO ---
+        function actualizarMapa() {
+            const lat = document.getElementById('latitud').value.trim();
+            const lon = document.getElementById('longitud').value.trim();
+            const vistaMapa = document.getElementById('vista-mapa');
+            
+            if (lat !== "" && lon !== "") {
+                const urlMapa = `https://maps.google.com/maps?q=${lat},${lon}&hl=es&z=17&t=k&output=embed`;
+                vistaMapa.style.display = 'block';
+                vistaMapa.innerHTML = `<iframe src="${urlMapa}"></iframe>`;
+            } else {
+                vistaMapa.style.display = 'none';
+            }
+        }
+
+        document.getElementById('latitud').addEventListener('change', actualizarMapa);
+        document.getElementById('longitud').addEventListener('change', actualizarMapa);
+
         function obtenerGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
                     document.getElementById('latitud').value = pos.coords.latitude.toFixed(6);
                     document.getElementById('longitud').value = pos.coords.longitude.toFixed(6);
-                    alert("¡Coordenadas obtenidas correctamente!");
-                }, () => { alert("Error al obtener GPS. Asegúrate de tenerlo activado."); });
+                    
+                    actualizarMapa();
+                    alert("¡Coordenadas obtenidas y mapa cargado!");
+                }, () => { alert("Error al obtener GPS. Asegúrate de tenerlo activado y darle permisos al navegador."); });
             } else { alert("GPS no soportado en este dispositivo."); }
         }
 
-        // --- 3. MAGIA: ESTAMPAR TEXTOS EN EL PDF ---
+        // --- ESTAMPAR TEXTOS EN EL PDF ---
         async function llenarYDescargarPDF() {
             try {
-                // Leer el archivo PDF original de la misma carpeta
                 const urlPDF = 'formato_vacio.pdf'; 
                 const existingPdfBytes = await fetch(urlPDF).then(res => res.arrayBuffer());
 
-                // Cargar el documento con pdf-lib
                 const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
                 const pages = pdfDoc.getPages();
-                const pagina = pages[0]; // La primera hoja
+                const pagina = pages[0];
 
-                // Función auxiliar para facilitar el estampado (Fuente Arial normal y X para casillas)
                 const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
                 const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
-                const size = 9; // Tamaño de letra para que encaje bien en las líneas
+                const size = 9;
 
                 const estampar = (idHTML, x, y, esCheck = false) => {
                     const el = document.getElementById(idHTML);
@@ -201,102 +224,94 @@
                     }
                 };
 
-                /* * COORDENADAS CALCULADAS (X, Y)
-                 * En PDF-Lib: X es distancia desde la izquierda. Y es distancia desde ABAJO.
-                 * Si un texto queda chueco, solo cambia estos numeritos.
-                 */
-
                 // USO EXCLUSIVO Y TÍTULO
-                estampar('num_registro', 380, 651);
-                estampar('chk_verificacion', 376, 637, true);
-                estampar('chk_certificacion', 537, 638, true);
-                estampar('unidad_produccion', 116, 555);
+                estampar('num_registro', 380, 646);
+                estampar('chk_verificacion', 372, 635, true);
+                estampar('chk_certificacion', 534, 635, true);
+                estampar('unidad_produccion', 116, 551);
 
                 // I. DATOS GENERALES
-                estampar('chk_fisica', 164, 517, true);
-                estampar('chk_moral', 274, 517, true);
-                estampar('rfc', 324, 517);
+                estampar('chk_fisica', 161, 513, true);
+                estampar('chk_moral', 270, 514, true);
+                estampar('rfc', 321, 513);
                 
-                estampar('nombre_propietario', 316, 507);
+                estampar('nombre_propietario', 311, 503);
                 
-                estampar('calle_gral', 168, 498);
-                estampar('num_gral', 307, 497);
-                estampar('colonia_gral', 475, 497);
+                estampar('calle_gral', 169, 493);
+                estampar('num_gral', 306, 494);
+                estampar('colonia_gral', 475, 494);
                 
-                estampar('mun_gral', 120, 488);
-                estampar('estado_gral', 231, 489);
-                estampar('cp_gral', 316, 489);
-                estampar('tel_gral', 454, 488);
+                estampar('mun_gral', 121, 483);
+                estampar('estado_gral', 231, 484);
+                estampar('cp_gral', 317, 485);
+                estampar('tel_gral', 455, 483);
                 
                 // Correo electrónico en minúsculas
                 const correoGral = document.getElementById('correo_gral').value.toLowerCase();
-                pagina.drawText(correoGral, { x: 170, y: 477, size: size, font: font });
+                pagina.drawText(correoGral, { x: 170, y: 473, size: size, font: font });
 
                 // II. DATOS DEL ESTABLECIMIENTO
-                estampar('razon_social', 199, 432);
-                estampar('tel_est', 284, 397);
+                estampar('razon_social', 199, 428);
+                estampar('tel_est', 284, 393);
                 
-                estampar('calle_est', 102, 407);
-                estampar('num_est', 223, 407);
-                estampar('colonia_est', 382, 407);
+                estampar('calle_est', 100, 402);
+                estampar('num_est', 221, 402);
+                estampar('colonia_est', 379, 402);
                 
-                estampar('mun_est', 492, 407);
-                estampar('estado_est', 103, 397);
-                estampar('cp_est', 181, 397);
+                estampar('mun_est', 489, 403);
+                estampar('estado_est', 99, 393);
+                estampar('cp_est', 177, 394);
                 
                 const correoEst = document.getElementById('correo_est').value.toLowerCase();
-                pagina.drawText(correoEst, { x: 166, y: 388, size: size, font: font });
+                pagina.drawText(correoEst, { x: 165, y: 473, size: size, font: font });
 
                 // GEORREFERENCIACIÓN
                 const coordsStr = document.getElementById('latitud').value + ", " + document.getElementById('longitud').value;
                 if (coordsStr !== ", ") {
-                    pagina.drawText(coordsStr, { x: 262, y: 369, size: size, font: font });
+                    pagina.drawText(coordsStr, { x: 261, y: 365, size: size, font: font });
                 }
                 
-                estampar('chk_nacional', 303, 347, true);
-                estampar('chk_exportacion', 398, 347, true);
+                estampar('chk_nacional', 300, 343, true);
+                estampar('chk_exportacion', 391, 343, true);
 
-                estampar('origen', 231, 279);
-                estampar('superficie', 226, 266);
-                estampar('volumen', 266, 253);
+                estampar('origen', 227, 275);
+                estampar('superficie', 223, 261);
+                estampar('volumen', 263, 247);
 
                 // III. FECHA Y LUGAR
-                estampar('lugar_fecha', 139, 151);
+                estampar('lugar_fecha', 138, 144);
 
                 // NOMBRE ABAJO DE LA FIRMA (Se copia automático del general)
                 const nombreFirma = document.getElementById('nombre_propietario').value.toUpperCase();
                 pagina.drawText(nombreFirma, { x: 130, y: 215, size: size, font: font });
 
-                // ESTAMPADO DE LA FIRMA
                 const firmaDataUrl = canvas.toDataURL('image/png');
                 const firmaImageBytes = await fetch(firmaDataUrl).then(res => res.arrayBuffer());
                 const firmaImage = await pdfDoc.embedPng(firmaImageBytes);
                 
                 // Ajusta la posición de la firma (X, Y) y su tamaño
                 pagina.drawImage(firmaImage, {
-                    x: 214, 
-                    y: 225, 
+                    x: 216, 
+                    y: 199, 
                     width: 140, 
                     height: 40
                 });
 
-                // --- 4. SEGUNDA PÁGINA: MAPA SATELITAL ---
-                // Agregamos una segunda hoja con el enlace exacto a las coordenadas para cumplir con la ubicación
+                // --- PÁGINA 2: COORDENADAS ---
                 const lat = document.getElementById('latitud').value;
                 const lon = document.getElementById('longitud').value;
                 
                 if (lat && lon) {
                     const page2 = pdfDoc.addPage([612, 792]); // Tamaño carta
-                    page2.drawText("ANEXO: UBICACIÓN SATELITAL Y COORDENADAS", { x: 150, y: 700, size: 14, font: fontBold });
-                    page2.drawText(`Latitud: ${lat}`, { x: 50, y: 660, size: 12, font: font });
-                    page2.drawText(`Longitud: ${lon}`, { x: 50, y: 640, size: 12, font: font });
-                    page2.drawText(`Puede consultar la ubicación satelital escaneando o ingresando al siguiente enlace:`, { x: 50, y: 600, size: 10, font: font });
+                    page2.drawText("ANEXO: UBICACIÓN SATELITAL Y COORDENADAS", { x: 120, y: 720, size: 14, font: fontBold });
+                    page2.drawText(`Latitud: ${lat}`, { x: 50, y: 680, size: 12, font: font });
+                    page2.drawText(`Longitud: ${lon}`, { x: 50, y: 660, size: 12, font: font });
+                    page2.drawText(`Puede consultar la ubicación satelital escaneando o ingresando al siguiente enlace:`, { x: 50, y: 630, size: 10, font: font });
                     
-                    const urlGoogleMaps = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-                    page2.drawText(urlGoogleMaps, { x: 50, y: 580, size: 10, font: font, color: PDFLib.rgb(0, 0, 1) });
+                    const urlGoogleMaps = `https://maps.google.com/maps?q=${lat},${lon}`;
+                    page2.drawText(urlGoogleMaps, { x: 50, y: 610, size: 10, font: font, color: PDFLib.rgb(0, 0, 1) });
                 }
 
-                // Generar y descargar el archivo
                 const pdfBytes = await pdfDoc.save();
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const link = document.createElement('a');
@@ -308,7 +323,7 @@
 
             } catch (error) {
                 console.error(error);
-                alert("Hubo un error al generar el PDF. Verifica que el archivo 'formato_vacio.pdf' esté guardado en la misma carpeta que esta página.");
+                alert("Hubo un error al generar el PDF. Verifica que el archivo 'formato_vacio.pdf' esté en la misma carpeta e inténtalo de nuevo.");
             }
         }
     </script>
