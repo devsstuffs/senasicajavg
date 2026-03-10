@@ -15,7 +15,7 @@
         .seccion-titulo { font-weight: bold; font-size: 14px; margin-bottom: 10px; color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
         
         label { font-weight: bold; margin-top: 10px; display: block; font-size: 12px; color: #333; }
-        input[type="text"], input[type="number"], input[type="email"] { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #aaa; border-radius: 4px; box-sizing: border-box; text-transform: uppercase; font-size: 13px; background: #fff;}
+        input[type="text"], input[type="number"], input[type="email"], input[type="file"] { width: 100%; padding: 8px; margin-top: 4px; border: 1px solid #aaa; border-radius: 4px; box-sizing: border-box; text-transform: uppercase; font-size: 13px; background: #fff;}
         input[type="email"] { text-transform: lowercase; }
         
         .fila { display: flex; gap: 10px; }
@@ -127,8 +127,35 @@
             </div>
         </div>
 
+        <div class="seccion" style="border: 2px solid #e67e22; background-color: #fdf2e9;">
+            <div class="seccion-titulo" style="color: #d35400; border-bottom: 1px solid #f0b27a;">IV. EVIDENCIA FOTOGRÁFICA PARA ANEXOS</div>
+            <p style="font-size: 12px; color: #555; text-align: center; margin-bottom: 15px;">Al tomar o seleccionar las fotografías, los botones se pondrán verdes. Se imprimirán en una tercera hoja del documento final.</p>
+            
+            <div class="fila">
+                <div>
+                    <input type="file" id="foto1" accept="image/*" capture="environment" style="display: none;" onchange="document.getElementById('lbl-foto1').innerText = '✅ Foto 1 capturada'; document.getElementById('lbl-foto1').style.backgroundColor = '#27ae60';">
+                    <label for="foto1" id="lbl-foto1" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📷 Tomar Fotografía 1</label>
+                </div>
+                <div>
+                    <input type="file" id="foto2" accept="image/*" capture="environment" style="display: none;" onchange="document.getElementById('lbl-foto2').innerText = '✅ Foto 2 capturada'; document.getElementById('lbl-foto2').style.backgroundColor = '#27ae60';">
+                    <label for="foto2" id="lbl-foto2" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📷 Tomar Fotografía 2</label>
+                </div>
+            </div>
+            
+            <div class="fila" style="margin-top: 10px;">
+                <div>
+                    <input type="file" id="foto3" accept="image/*" capture="environment" style="display: none;" onchange="document.getElementById('lbl-foto3').innerText = '✅ Foto 3 capturada'; document.getElementById('lbl-foto3').style.backgroundColor = '#27ae60';">
+                    <label for="foto3" id="lbl-foto3" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📷 Tomar Fotografía 3</label>
+                </div>
+                <div>
+                    <input type="file" id="foto4" accept="image/*" capture="environment" style="display: none;" onchange="document.getElementById('lbl-foto4').innerText = '✅ Foto 4 capturada'; document.getElementById('lbl-foto4').style.backgroundColor = '#27ae60';">
+                    <label for="foto4" id="lbl-foto4" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📷 Tomar Fotografía 4</label>
+                </div>
+            </div>
+        </div>
+
         <div class="seccion">
-            <div class="seccion-titulo">III. FIRMA Y FECHA</div>
+            <div class="seccion-titulo">V. FIRMA Y FECHA</div>
             <label>Lugar y Fecha:</label>
             <input type="text" id="lugar_fecha" placeholder="EJ. LOS MOCHIS, AHOME, SINALOA A...">
             
@@ -289,21 +316,16 @@
                 const firmaImageBytes = await fetch(firmaDataUrl).then(res => res.arrayBuffer());
                 const firmaImage = await pdfDoc.embedPng(firmaImageBytes);
                 
-                // Ajusta la posición de la firma (X, Y) y su tamaño
-                pagina.drawImage(firmaImage, {
-                    x: 216, 
-                    y: 199, 
-                    width: 140, 
-                    height: 40
-                });
+                // Ajusta la posición de la firma
+                pagina.drawImage(firmaImage, { x: 216, y: 199, width: 140, height: 40 });
 
-                // --- PÁGINA 2: COORDENADAS ---
+                // --- PÁGINA 2: ANEXO DE MAPA ---
                 const lat = document.getElementById('latitud').value;
                 const lon = document.getElementById('longitud').value;
                 
                 if (lat && lon) {
                     const page2 = pdfDoc.addPage([612, 792]); // Tamaño carta
-                    page2.drawText("ANEXO: UBICACIÓN SATELITAL Y COORDENADAS", { x: 120, y: 720, size: 14, font: fontBold });
+                    page2.drawText("ANEXO 1: UBICACIÓN SATELITAL Y COORDENADAS", { x: 100, y: 720, size: 14, font: fontBold });
                     page2.drawText(`Latitud: ${lat}`, { x: 50, y: 680, size: 12, font: font });
                     page2.drawText(`Longitud: ${lon}`, { x: 50, y: 660, size: 12, font: font });
                     page2.drawText(`Puede consultar la ubicación satelital escaneando o ingresando al siguiente enlace:`, { x: 50, y: 630, size: 10, font: font });
@@ -311,42 +333,81 @@
                     const urlGoogleMaps = `https://maps.google.com/maps?q=${lat},${lon}`;
                     page2.drawText(urlGoogleMaps, { x: 50, y: 610, size: 10, font: font, color: PDFLib.rgb(0, 0, 1) });
 
-                    // =========================================================================
-                    // ESTO ES LO ÚNICO NUEVO: INSERTA EL MAPA EN EL PDF SIN TOCAR GOOGLE MAPS
-                    // =========================================================================
                     try {
                         const latNum = parseFloat(lat);
                         const lonNum = parseFloat(lon);
-                        const offset = 0.0025; // Define el nivel de zoom del mapa en el PDF
+                        const offset = 0.0025; // Nivel de zoom
                         const bbox = `${lonNum - offset},${latNum - offset},${lonNum + offset},${latNum + offset}`;
                         
-                        // Obtenemos una imagen estática de satélite de un servidor libre (Esri/ArcGIS)
-                        const urlSatelite = `https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox=${bbox}&bboxSR=4326&imageSR=4326&size=450,400&format=png&f=image`;
+                        const urlSatelite = `https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox=${bbox}&bboxSR=4326&imageSR=4326&size=500,450&format=png&f=image`;
+                        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlSatelite)}`;
                         
-                        const imgMapaBytes = await fetch(urlSatelite).then(res => res.arrayBuffer());
+                        const imgMapaBytes = await fetch(proxyUrl).then(res => res.arrayBuffer());
                         const imagenMapa = await pdfDoc.embedPng(imgMapaBytes);
 
-                        const imgAncho = 450;
-                        const imgAlto = 400;
+                        // Como el mapa está solo en esta hoja, lo hacemos grande y centrado
+                        const imgAncho = 480; 
+                        const imgAlto = 400; 
                         const imgX = (page2.getWidth() / 2) - (imgAncho / 2);
-                        const imgY = 170; // Altura en la hoja del PDF
+                        const imgY = 160; 
 
-                        // Pegar la foto en la segunda hoja
                         page2.drawImage(imagenMapa, { x: imgX, y: imgY, width: imgAncho, height: imgAlto });
 
-                        // Dibujar manualmente el pin (Punto rojo) exactamente en el centro de la imagen
-                        page2.drawCircle({
-                            x: imgX + (imgAncho / 2),
-                            y: imgY + (imgAlto / 2),
-                            size: 6,
-                            color: PDFLib.rgb(0.9, 0.1, 0.1),
-                            borderColor: PDFLib.rgb(1, 1, 1),
-                            borderWidth: 2,
-                        });
+                        // Pin rojo
+                        page2.drawCircle({ x: imgX + (imgAncho / 2), y: imgY + (imgAlto / 2), size: 8, color: PDFLib.rgb(1, 1, 1) });
+                        page2.drawCircle({ x: imgX + (imgAncho / 2), y: imgY + (imgAlto / 2), size: 5, color: PDFLib.rgb(0.9, 0.1, 0.1) });
                     } catch (e) {
                         console.log("Aviso: No se pudo descargar la imagen satelital para el PDF.", e);
                     }
-                    // =========================================================================
+                }
+
+                // --- PÁGINA 3: ANEXO DE FOTOGRAFÍAS ---
+                // Verifica si el usuario adjuntó al menos una foto
+                const tieneFotos = document.getElementById('foto1').files.length > 0 || 
+                                   document.getElementById('foto2').files.length > 0 || 
+                                   document.getElementById('foto3').files.length > 0 || 
+                                   document.getElementById('foto4').files.length > 0;
+
+                if (tieneFotos) {
+                    const page3 = pdfDoc.addPage([612, 792]);
+                    page3.drawText("ANEXO 2: EVIDENCIA FOTOGRÁFICA", { x: 180, y: 740, size: 14, font: fontBold });
+
+                    // Función para procesar y estampar cada foto en la hoja 3
+                    const procesarFoto = async (idInput, pagina, xPos, yPos, maxW, maxH) => {
+                        const input = document.getElementById(idInput);
+                        if (input && input.files.length > 0) {
+                            try {
+                                const file = input.files[0];
+                                const imgBytes = await file.arrayBuffer();
+                                let imgDoc;
+                                
+                                if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
+                                    imgDoc = await pdfDoc.embedJpg(imgBytes);
+                                } else if (file.type === 'image/png') {
+                                    imgDoc = await pdfDoc.embedPng(imgBytes);
+                                }
+                                
+                                if (imgDoc) {
+                                    const dims = imgDoc.scaleToFit(maxW, maxH);
+                                    const imgX = xPos + (maxW / 2) - (dims.width / 2);
+                                    const imgY = yPos + (maxH / 2) - (dims.height / 2);
+                                    pagina.drawImage(imgDoc, { x: imgX, y: imgY, width: dims.width, height: dims.height });
+                                }
+                            } catch (e) {
+                                console.log("Aviso: No se pudo anexar la foto " + idInput, e);
+                            }
+                        }
+                    };
+
+                    // Cuadrícula 2x2 en la Hoja 3. 
+                    // Tamaño máximo de cada foto: 250 de ancho por 280 de alto
+                    // Fila 1 (Mitad superior)
+                    await procesarFoto('foto1', page3, 40, 400, 250, 280);
+                    await procesarFoto('foto2', page3, 320, 400, 250, 280);
+                    
+                    // Fila 2 (Mitad inferior)
+                    await procesarFoto('foto3', page3, 40, 80, 250, 280);
+                    await procesarFoto('foto4', page3, 320, 80, 250, 280);
                 }
 
                 const pdfBytes = await pdfDoc.save();
