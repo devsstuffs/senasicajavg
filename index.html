@@ -319,13 +319,13 @@
                 // Ajusta la posición de la firma
                 pagina.drawImage(firmaImage, { x: 216, y: 199, width: 140, height: 40 });
 
-                // --- PÁGINA 2: ANEXO DE MAPA ---
+                // --- PÁGINA 2: COORDENADAS ---
                 const lat = document.getElementById('latitud').value;
                 const lon = document.getElementById('longitud').value;
                 
                 if (lat && lon) {
                     const page2 = pdfDoc.addPage([612, 792]); // Tamaño carta
-                    page2.drawText("ANEXO 1: UBICACIÓN SATELITAL Y COORDENADAS", { x: 100, y: 720, size: 14, font: fontBold });
+                    page2.drawText("ANEXO: UBICACIÓN SATELITAL Y COORDENADAS", { x: 120, y: 720, size: 14, font: fontBold });
                     page2.drawText(`Latitud: ${lat}`, { x: 50, y: 680, size: 12, font: font });
                     page2.drawText(`Longitud: ${lon}`, { x: 50, y: 660, size: 12, font: font });
                     page2.drawText(`Puede consultar la ubicación satelital escaneando o ingresando al siguiente enlace:`, { x: 50, y: 630, size: 10, font: font });
@@ -333,32 +333,43 @@
                     const urlGoogleMaps = `https://maps.google.com/maps?q=${lat},${lon}`;
                     page2.drawText(urlGoogleMaps, { x: 50, y: 610, size: 10, font: font, color: PDFLib.rgb(0, 0, 1) });
 
+                    // =========================================================================
+                    // ESTO ES LO ÚNICO NUEVO: INSERTA EL MAPA EN EL PDF SIN TOCAR GOOGLE MAPS
+                    // ESTE CÓDIGO ES EXACTAMENTE EL QUE ME DISTE, INTACTO
+                    // =========================================================================
                     try {
                         const latNum = parseFloat(lat);
                         const lonNum = parseFloat(lon);
-                        const offset = 0.0025; // Nivel de zoom
+                        const offset = 0.0025; // Define el nivel de zoom del mapa en el PDF
                         const bbox = `${lonNum - offset},${latNum - offset},${lonNum + offset},${latNum + offset}`;
                         
-                        const urlSatelite = `https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox=${bbox}&bboxSR=4326&imageSR=4326&size=500,450&format=png&f=image`;
-                        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlSatelite)}`;
+                        // Obtenemos una imagen estática de satélite de un servidor libre (Esri/ArcGIS)
+                        const urlSatelite = `https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox=${bbox}&bboxSR=4326&imageSR=4326&size=450,400&format=png&f=image`;
                         
-                        const imgMapaBytes = await fetch(proxyUrl).then(res => res.arrayBuffer());
+                        const imgMapaBytes = await fetch(urlSatelite).then(res => res.arrayBuffer());
                         const imagenMapa = await pdfDoc.embedPng(imgMapaBytes);
 
-                        // Como el mapa está solo en esta hoja, lo hacemos grande y centrado
-                        const imgAncho = 480; 
-                        const imgAlto = 400; 
+                        const imgAncho = 450;
+                        const imgAlto = 400;
                         const imgX = (page2.getWidth() / 2) - (imgAncho / 2);
-                        const imgY = 160; 
+                        const imgY = 170; // Altura en la hoja del PDF
 
+                        // Pegar la foto en la segunda hoja
                         page2.drawImage(imagenMapa, { x: imgX, y: imgY, width: imgAncho, height: imgAlto });
 
-                        // Pin rojo
-                        page2.drawCircle({ x: imgX + (imgAncho / 2), y: imgY + (imgAlto / 2), size: 8, color: PDFLib.rgb(1, 1, 1) });
-                        page2.drawCircle({ x: imgX + (imgAncho / 2), y: imgY + (imgAlto / 2), size: 5, color: PDFLib.rgb(0.9, 0.1, 0.1) });
+                        // Dibujar manualmente el pin (Punto rojo) exactamente en el centro de la imagen
+                        page2.drawCircle({
+                            x: imgX + (imgAncho / 2),
+                            y: imgY + (imgAlto / 2),
+                            size: 6,
+                            color: PDFLib.rgb(0.9, 0.1, 0.1),
+                            borderColor: PDFLib.rgb(1, 1, 1),
+                            borderWidth: 2,
+                        });
                     } catch (e) {
                         console.log("Aviso: No se pudo descargar la imagen satelital para el PDF.", e);
                     }
+                    // =========================================================================
                 }
 
                 // --- PÁGINA 3: ANEXO DE FOTOGRAFÍAS ---
