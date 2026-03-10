@@ -263,7 +263,7 @@
                 estampar('cp_est', 177, 394);
                 
                 const correoEst = document.getElementById('correo_est').value.toLowerCase();
-                pagina.drawText(correoEst, { x: 165, y: 383, size: size, font: font });
+                pagina.drawText(correoEst, { x: 165, y: 473, size: size, font: font });
 
                 // GEORREFERENCIACIÓN
                 const coordsStr = document.getElementById('latitud').value + ", " + document.getElementById('longitud').value;
@@ -310,6 +310,43 @@
                     
                     const urlGoogleMaps = `https://maps.google.com/maps?q=${lat},${lon}`;
                     page2.drawText(urlGoogleMaps, { x: 50, y: 610, size: 10, font: font, color: PDFLib.rgb(0, 0, 1) });
+
+                    // =========================================================================
+                    // ESTO ES LO ÚNICO NUEVO: INSERTA EL MAPA EN EL PDF SIN TOCAR GOOGLE MAPS
+                    // =========================================================================
+                    try {
+                        const latNum = parseFloat(lat);
+                        const lonNum = parseFloat(lon);
+                        const offset = 0.0025; // Define el nivel de zoom del mapa en el PDF
+                        const bbox = `${lonNum - offset},${latNum - offset},${lonNum + offset},${latNum + offset}`;
+                        
+                        // Obtenemos una imagen estática de satélite de un servidor libre (Esri/ArcGIS)
+                        const urlSatelite = `https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox=${bbox}&bboxSR=4326&imageSR=4326&size=450,400&format=png&f=image`;
+                        
+                        const imgMapaBytes = await fetch(urlSatelite).then(res => res.arrayBuffer());
+                        const imagenMapa = await pdfDoc.embedPng(imgMapaBytes);
+
+                        const imgAncho = 450;
+                        const imgAlto = 400;
+                        const imgX = (page2.getWidth() / 2) - (imgAncho / 2);
+                        const imgY = 170; // Altura en la hoja del PDF
+
+                        // Pegar la foto en la segunda hoja
+                        page2.drawImage(imagenMapa, { x: imgX, y: imgY, width: imgAncho, height: imgAlto });
+
+                        // Dibujar manualmente el pin (Punto rojo) exactamente en el centro de la imagen
+                        page2.drawCircle({
+                            x: imgX + (imgAncho / 2),
+                            y: imgY + (imgAlto / 2),
+                            size: 6,
+                            color: PDFLib.rgb(0.9, 0.1, 0.1),
+                            borderColor: PDFLib.rgb(1, 1, 1),
+                            borderWidth: 2,
+                        });
+                    } catch (e) {
+                        console.log("Aviso: No se pudo descargar la imagen satelital para el PDF.", e);
+                    }
+                    // =========================================================================
                 }
 
                 const pdfBytes = await pdfDoc.save();
