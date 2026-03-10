@@ -2,284 +2,160 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=850">
-    <title>Aviso SENASICA Oficial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llenado de Formato SENASICA</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <style>
-        body {
-            background-color: #525659;
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-        }
-
-        /* Contenedor del documento. Dimensiones proporcionales a una hoja real */
-        #documento-papel {
-            background-color: white;
-            width: 800px;
-            height: 1131px; /* Proporción A4/Carta */
-            margin: 0 auto;
-            position: relative;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            overflow: hidden;
-        }
-
-        /* La imagen original se usa como fondo exacto */
-        #fondo-oficial {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-
-        /* Configuración de las "cajas invisibles" para escribir */
-        input[type="text"], input[type="number"], input[type="email"] {
-            position: absolute;
-            z-index: 10;
-            background-color: rgba(255, 255, 0, 0.25); /* Tono amarillo para guiar en celular */
-            border: none;
-            outline: none;
-            font-family: Arial, sans-serif;
-            font-size: 13px;
-            font-weight: bold;
-            color: #000;
-            padding: 0 5px;
-            text-transform: uppercase;
-        }
-
-        input[type="checkbox"] {
-            position: absolute;
-            z-index: 10;
-            transform: scale(1.5);
-            cursor: pointer;
-        }
-
-        /* --- POSICIONES EXACTAS DE LOS CAMPOS (Basadas en tu imagen) --- */
-        /* Uso Exclusivo */
-        #uso_registro { top: 14.8%; left: 52%; width: 44%; }
-        #chk_verificacion { top: 16.5%; left: 47%; }
-        #chk_certificacion { top: 16.5%; left: 63%; }
-
-        /* Párrafo legal */
-        #parrafo_establecimiento { top: 27.2%; left: 9.5%; width: 23%; height: 1.5%; text-align: center; }
-
-        /* I. Datos Generales */
-        #chk_fisica { top: 33%; left: 19%; }
-        #chk_moral { top: 33%; left: 36%; }
-        #gral_rfc { top: 32.5%; left: 49%; width: 20%; }
-        #gral_nombre { top: 34.2%; left: 34.5%; width: 45%; }
-        #gral_calle { top: 35.8%; left: 15%; width: 20%; }
-        #gral_num { top: 35.8%; left: 42%; width: 10%; }
-        #gral_col { top: 35.8%; left: 71%; width: 24%; }
-        #gral_mun { top: 37.5%; left: 10%; width: 12%; }
-        #gral_est { top: 37.5%; left: 30%; width: 13%; }
-        #gral_cp { top: 37.5%; left: 48%; width: 8%; }
-        #gral_tel { top: 37.5%; left: 68%; width: 15%; }
-        #gral_correo { top: 39.2%; left: 18%; width: 35%; text-transform: lowercase; }
-
-        /* II. Datos del Establecimiento */
-        #est_razon { top: 44.8%; left: 23%; width: 25%; }
-        #est_calle { top: 48.2%; left: 7.5%; width: 17%; }
-        #est_num { top: 48.2%; left: 31%; width: 9%; }
-        #est_col { top: 48.2%; left: 56%; width: 18%; }
-        #est_mun { top: 48.2%; left: 83%; width: 14%; }
-        #est_est { top: 50%; left: 8%; width: 11%; }
-        #est_cp { top: 50%; left: 24%; width: 9%; }
-        #est_tel { top: 50%; left: 42%; width: 13%; }
-        #est_correo { top: 51.5%; left: 19%; width: 30%; text-transform: lowercase; }
-
-        /* Georreferenciación */
-        #geo_lat { top: 53.5%; left: 38%; width: 13%; text-align: center;}
-        #geo_lon { top: 53.5%; left: 55%; width: 13%; text-align: center;}
-        #chk_nacional { top: 56.5%; left: 43.5%; }
-        #chk_exportacion { top: 56.5%; left: 61%; } /* Ya tiene la X, pero ponemos el checkbox encima por si acaso */
-
-        #origen_prod { top: 65.5%; left: 26%; width: 40%; }
-        #area_sup { top: 67.5%; left: 24%; width: 12%; }
-        #volumen_prod { top: 69.5%; left: 32%; width: 12%; }
-
-        /* III. Firma */
-        #canvas-firma {
-            position: absolute;
-            z-index: 10;
-            top: 71%;
-            left: 28%;
-            width: 44%;
-            height: 6%;
-            border: 1px dashed #c0392b;
-            background-color: rgba(255, 255, 0, 0.1);
-            touch-action: none;
-            cursor: crosshair;
-        }
-        #nombre_firma { top: 76.5%; left: 28%; width: 44%; text-align: center; font-size: 14px; background: transparent;}
-        #lugar_fecha { top: 82.5%; left: 16%; width: 35%; }
-
-        /* Botones Flotantes */
-        .controles { text-align: center; margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; max-width: 800px; margin: 0 auto 20px auto; }
-        button { padding: 12px 15px; font-size: 14px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; color: white; font-weight: bold; }
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; padding: 20px; }
+        .formulario { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #2c3e50; }
+        label { font-weight: bold; margin-top: 15px; display: block; font-size: 14px; color: #333; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; text-transform: uppercase; }
+        .fila { display: flex; gap: 10px; }
+        .fila div { flex: 1; }
+        
+        #canvas-firma { border: 2px dashed #3498db; background-color: #f9f9f9; width: 100%; height: 150px; margin-top: 10px; touch-action: none; cursor: crosshair; }
+        
+        button { width: 100%; padding: 15px; font-size: 16px; margin-top: 15px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; }
         .btn-gps { background-color: #27ae60; }
-        .btn-manual { background-color: #d35400; }
-        .btn-limpiar { background-color: #34495e; }
         .btn-pdf { background-color: #c0392b; }
-
-        /* Segunda página */
-        .pagina-mapa { width: 800px; margin: 20px auto 0 auto; background: white; padding: 20px; box-sizing: border-box; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        #mapa-iframe { width: 100%; height: 600px; border: 2px solid #000; background: #eee; margin-top: 10px;}
-
-        /* --- CONFIGURACIÓN DE IMPRESIÓN OFICIAL --- */
-        @media print {
-            body { background-color: #fff; padding: 0; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
-            .controles { display: none !important; }
-            #documento-papel { box-shadow: none; margin: 0; border: none; }
-            .pagina-mapa { box-shadow: none; margin: 0; padding: 0; page-break-before: always; }
-            /* Quitar el fondo amarillo de los campos al generar PDF */
-            input[type="text"], input[type="number"], input[type="email"] { background-color: transparent !important; }
-            #canvas-firma { background-color: transparent !important; border: none !important; }
-        }
+        .btn-limpiar { background-color: #7f8c8d; }
     </style>
 </head>
 <body>
 
-    <div class="controles">
-        <button class="btn-gps" onclick="obtenerGPS()">📍 Obtener GPS Actual</button>
-        <button class="btn-manual" onclick="ingresarCoordenadasManuales()">🗺️ Ingresar Coordenadas a Mano</button>
-        <button class="btn-limpiar" onclick="limpiarFirma()">🧹 Borrar Firma</button>
-        <button class="btn-pdf" onclick="window.print()">📄 Guardar PDF Oficial</button>
-    </div>
+    <div class="formulario">
+        <h2>Captura de Datos - SENASICA</h2>
+        <p style="text-align:center; font-size: 12px; color: #666;">Llena los datos aquí. Al generar, se estamparán en el PDF oficial.</p>
 
-    <div id="documento-papel">
-        <img src="image_5c6bdc.png" id="fondo-oficial" alt="Formato SENASICA">
+        <label>Nombre del Propietario:</label>
+        <input type="text" id="nombre_propietario" placeholder="Ej. JUAN PEREZ">
 
-        <input type="text" id="uso_registro">
-        <input type="checkbox" id="chk_verificacion">
-        <input type="checkbox" id="chk_certificacion">
+        <label>RFC:</label>
+        <input type="text" id="rfc" placeholder="Ej. PEMA800101XYZ">
 
-        <input type="text" id="parrafo_establecimiento">
-
-        <input type="checkbox" id="chk_fisica">
-        <input type="checkbox" id="chk_moral">
-        <input type="text" id="gral_rfc" maxlength="13">
-        <input type="text" id="gral_nombre">
-        <input type="text" id="gral_calle">
-        <input type="text" id="gral_num">
-        <input type="text" id="gral_col">
-        <input type="text" id="gral_mun">
-        <input type="text" id="gral_est">
-        <input type="text" id="gral_cp">
-        <input type="text" id="gral_tel">
-        <input type="email" id="gral_correo">
-
-        <input type="text" id="est_razon">
-        <input type="text" id="est_calle">
-        <input type="text" id="est_num">
-        <input type="text" id="est_col">
-        <input type="text" id="est_mun">
-        <input type="text" id="est_est">
-        <input type="text" id="est_cp">
-        <input type="text" id="est_tel">
-        <input type="email" id="est_correo">
-
-        <input type="text" id="geo_lat" placeholder="Latitud">
-        <input type="text" id="geo_lon" placeholder="Longitud">
-        
-        <input type="checkbox" id="chk_nacional">
-        <input type="checkbox" id="chk_exportacion" checked>
-
-        <input type="text" id="origen_prod">
-        <input type="number" step="0.01" id="area_sup">
-        <input type="number" step="0.01" id="volumen_prod">
-
-        <canvas id="canvas-firma" width="350" height="70"></canvas>
-        <input type="text" id="nombre_firma">
-        <input type="text" id="lugar_fecha">
-    </div>
-
-    <div class="pagina-mapa">
-        <h2 style="text-align: center; font-family: Arial;">ANEXO: UBICACIÓN SATELITAL</h2>
-        <div id="mapa-iframe">
-            <p style="text-align: center; color: #666; margin-top: 280px; font-family: Arial;">
-                <em>El mapa satelital aparecerá aquí al obtener las coordenadas.</em>
-            </p>
+        <div class="fila">
+            <div>
+                <label>Latitud:</label>
+                <input type="text" id="latitud">
+            </div>
+            <div>
+                <label>Longitud:</label>
+                <input type="text" id="longitud">
+            </div>
         </div>
+        <button class="btn-gps" onclick="obtenerGPS()">📍 Obtener Coordenadas Actuales</button>
+
+        <label>Área o Superficie (has):</label>
+        <input type="number" step="0.01" id="superficie">
+
+        <label>Lugar y Fecha:</label>
+        <input type="text" id="lugar_fecha" placeholder="Ej. LOS MOCHIS, SINALOA A...">
+
+        <label>Firma del Propietario:</label>
+        <canvas id="canvas-firma"></canvas>
+        <button class="btn-limpiar" onclick="limpiarFirma()">🧹 Borrar Firma</button>
+
+        <button class="btn-pdf" onclick="llenarYDescargarPDF()">📄 Generar Documento Oficial</button>
     </div>
 
     <script>
-        // Sincronizar nombre (Datos Generales -> Firma)
-        const inputGralNombre = document.getElementById('gral_nombre');
-        const inputNombreFirma = document.getElementById('nombre_firma');
-        inputGralNombre.addEventListener('input', () => { inputNombreFirma.value = inputGralNombre.value; });
-        inputNombreFirma.addEventListener('input', () => { inputGralNombre.value = inputNombreFirma.value; });
-
-        // Lógica de dibujo para la firma en el canvas
+        // --- LÓGICA DE FIRMA (Igual que antes, adaptada a pantalla completa) ---
         const canvas = document.getElementById('canvas-firma');
         const ctx = canvas.getContext('2d');
         let dibujando = false;
 
-        ctx.lineWidth = 2.5;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.strokeStyle = '#000000'; // Tinta negra
+        function ajustarCanvas() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+        window.onload = ajustarCanvas;
 
-        function obtenerPosicion(e) {
+        ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
+
+        function obtenerPos(e) {
             const rect = canvas.getBoundingClientRect();
-            // Escala ajustada por si el usuario hace zoom en el celular
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
             let x = e.clientX || (e.touches && e.touches[0].clientX);
             let y = e.clientY || (e.touches && e.touches[0].clientY);
-            return { x: (x - rect.left) * scaleX, y: (y - rect.top) * scaleY };
+            return { x: x - rect.left, y: y - rect.top };
         }
 
-        function iniciarDibujo(e) { e.preventDefault(); dibujando = true; const pos = obtenerPosicion(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); }
-        function dibujar(e) { if (!dibujando) return; e.preventDefault(); const pos = obtenerPosicion(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); }
-        function detenerDibujo() { dibujando = false; }
-
-        canvas.addEventListener('mousedown', iniciarDibujo);
-        canvas.addEventListener('mousemove', dibujar);
-        canvas.addEventListener('mouseup', detenerDibujo);
-        canvas.addEventListener('mouseout', detenerDibujo);
-        canvas.addEventListener('touchstart', iniciarDibujo, {passive: false});
-        canvas.addEventListener('touchmove', dibujar, {passive: false});
-        canvas.addEventListener('touchend', detenerDibujo);
+        canvas.addEventListener('mousedown', (e) => { dibujando = true; ctx.beginPath(); ctx.moveTo(obtenerPos(e).x, obtenerPos(e).y); });
+        canvas.addEventListener('mousemove', (e) => { if(dibujando) { ctx.lineTo(obtenerPos(e).x, obtenerPos(e).y); ctx.stroke(); } });
+        canvas.addEventListener('mouseup', () => dibujando = false);
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); dibujando = true; ctx.beginPath(); ctx.moveTo(obtenerPos(e).x, obtenerPos(e).y); }, {passive: false});
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if(dibujando) { ctx.lineTo(obtenerPos(e).x, obtenerPos(e).y); ctx.stroke(); } }, {passive: false});
+        canvas.addEventListener('touchend', () => dibujando = false);
 
         function limpiarFirma() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-        // --- Lógica de Coordenadas y Mapa ---
+        // --- LÓGICA DE GPS ---
         function obtenerGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
-                    const lat = pos.coords.latitude.toFixed(6);
-                    const lon = pos.coords.longitude.toFixed(6);
-                    
-                    document.getElementById('geo_lat').value = lat;
-                    document.getElementById('geo_lon').value = lon;
-                    cargarMapaSatelital(lat, lon);
-                    alert("¡Ubicación cargada con éxito!");
-                }, () => { alert("Error: Verifica que el GPS esté encendido y Chrome/Safari tenga permiso de ubicación."); });
-            } else { alert("Tu dispositivo no soporta geolocalización."); }
+                    document.getElementById('latitud').value = pos.coords.latitude.toFixed(6);
+                    document.getElementById('longitud').value = pos.coords.longitude.toFixed(6);
+                    alert("¡Coordenadas obtenidas!");
+                });
+            } else { alert("GPS no soportado."); }
         }
 
-        function ingresarCoordenadasManuales() {
-            // Pedimos las coordenadas mediante una ventana emergente para que sea más fácil de pegar
-            let coords = prompt("Pega las coordenadas aquí (Latitud, Longitud):\nEjemplo: 25.910650, -109.342458");
-            if (coords && coords.includes(',')) {
-                let partes = coords.split(',');
-                let lat = partes[0].trim();
-                let lon = partes[1].trim();
+        // --- MAGIA: LECTURA DEL PDF Y ESTAMPADO DE DATOS ---
+        async function llenarYDescargarPDF() {
+            try {
+                // 1. Cargamos el PDF vacío original que tienes en la carpeta
+                // Asegúrate de nombrar tu PDF oficial como "formato_vacio.pdf"
+                const urlPDF = 'formato_vacio.pdf'; 
+                const existingPdfBytes = await fetch(urlPDF).then(res => res.arrayBuffer());
+
+                const pdfDoc = await PDFLib.PDFDocument.load(existingPdfBytes);
                 
-                document.getElementById('geo_lat').value = lat;
-                document.getElementById('geo_lon').value = lon;
-                cargarMapaSatelital(lat, lon);
-                alert("Mapa actualizado correctamente.");
-            } else if (coords) {
-                alert("Formato incorrecto. Asegúrate de separar la latitud y longitud con una coma.");
-            }
-        }
+                // Obtenemos la primera página del documento
+                const pages = pdfDoc.getPages();
+                const primeraPagina = pages[0];
 
-        function cargarMapaSatelital(lat, lon) {
-            const urlMapa = `https://maps.google.com/maps?q=$${lat},${lon}&t=k&z=17&output=embed`;
-            document.getElementById('mapa-iframe').innerHTML = `<iframe src="${urlMapa}" frameborder="0" style="width:100%; height:100%;"></iframe>`;
+                // 2. Extraemos los valores del formulario
+                const txtNombre = document.getElementById('nombre_propietario').value.toUpperCase();
+                const txtRFC = document.getElementById('rfc').value.toUpperCase();
+                const txtLat = document.getElementById('latitud').value;
+                const txtLon = document.getElementById('longitud').value;
+                const txtSup = document.getElementById('superficie').value;
+                const txtFecha = document.getElementById('lugar_fecha').value.toUpperCase();
+
+                // 3. Estampamos los textos en el PDF
+                // NOTA: El punto (x:0, y:0) en un PDF es la ESQUINA INFERIOR IZQUIERDA.
+                // Tendrás que jugar un poco con estos números para que caigan exacto en las rayas.
+                const tamañoTexto = 10;
+                
+                primeraPagina.drawText(txtNombre, { x: 150, y: 650, size: tamañoTexto }); // Ajusta X y Y
+                primeraPagina.drawText(txtRFC, { x: 450, y: 670, size: tamañoTexto });
+                primeraPagina.drawText(txtLat, { x: 200, y: 400, size: tamañoTexto });
+                primeraPagina.drawText(txtLon, { x: 300, y: 400, size: tamañoTexto });
+                primeraPagina.drawText(txtSup, { x: 150, y: 300, size: tamañoTexto });
+                primeraPagina.drawText(txtFecha, { x: 200, y: 150, size: tamañoTexto });
+
+                // 4. Estampamos la FIRMA
+                const firmaDataUrl = canvas.toDataURL('image/png');
+                const firmaImageBytes = await fetch(firmaDataUrl).then(res => res.arrayBuffer());
+                const firmaImage = await pdfDoc.embedPng(firmaImageBytes);
+                
+                // Dibujamos la firma (Ajusta la posición x, y según el espacio del PDF)
+                primeraPagina.drawImage(firmaImage, {
+                    x: 250, 
+                    y: 180, 
+                    width: 150, 
+                    height: 50
+                });
+
+                // 5. Generamos el nuevo PDF y lo descargamos
+                const pdfBytes = await pdfDoc.save();
+                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `AVISO_${txtNombre.replace(/ /g, '_')}.pdf`;
+                link.click();
+
+            } catch (error) {
+                console.error(error);
+                alert("Hubo un error al generar el PDF. Asegúrate de tener el archivo 'formato_vacio.pdf' en la misma carpeta que este HTML.");
+            }
         }
     </script>
 </body>
