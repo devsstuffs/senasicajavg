@@ -2,307 +2,233 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aviso de Inicio de Funcionamiento - SENASICA</title>
+    <meta name="viewport" content="width=850">
+    <title>Aviso SENASICA Oficial</title>
     <style>
-        /* CONFIGURACIÓN GENERAL PARA PANTALLA Y CELULAR */
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #e0e0e0;
+            background-color: #525659;
             margin: 0;
             padding: 20px;
-            font-size: 10pt;
-            color: #000;
+            font-family: Arial, sans-serif;
         }
 
-        /* CONTENEDOR TAMAÑO CARTA */
-        #documento-pdf {
-            background-color: #fff;
-            width: 21.59cm;
-            min-height: 27.94cm;
+        /* Contenedor del documento. Dimensiones proporcionales a una hoja real */
+        #documento-papel {
+            background-color: white;
+            width: 800px;
+            height: 1131px; /* Proporción A4/Carta */
             margin: 0 auto;
-            padding: 1.5cm 2cm;
-            box-sizing: border-box;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
 
-        /* ENCABEZADO OFICIAL (CON IMAGEN) */
-        .header-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-        .header-table td { vertical-align: middle; padding: 0; }
-        
-        .banner-img { width: 100%; max-width: 550px; display: block; height: auto; }
-        
-        .exclusive-box { 
-            border: 1px solid #000; 
-            padding: 6px; 
-            width: 220px; 
-            float: right; 
-            font-size: 8pt; 
-            text-align: left;
-            font-weight: bold;
-            box-sizing: border-box;
+        /* La imagen original se usa como fondo exacto */
+        #fondo-oficial {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
         }
 
-        /* TEXTOS Y PÁRRAFOS */
-        .director-name { text-align: center; font-weight: bold; font-size: 10pt; margin: 10px 0 20px 0; line-height: 1.2; }
-        p.legal-text { text-align: justify; font-size: 8.5pt; line-height: 1.5; margin-bottom: 20px; text-transform: uppercase; }
-        h4 { font-size: 10pt; margin: 0 0 10px 0; text-decoration: none; font-weight: bold; text-transform: uppercase; }
-
-        /* MARCOS DE SECCIÓN */
-        .section-frame { border: 1px solid #000; padding: 12px 15px; margin-bottom: 15px; box-sizing: border-box; }
-
-        /* CAMPOS DE FORMULARIO */
-        .row { margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: flex-end; font-size: 9pt; font-weight: bold;}
-        .inline-field { display: flex; align-items: flex-end; white-space: nowrap; margin-right: 15px; }
-        .inline-field-grow { flex-grow: 1; display: flex; align-items: flex-end; }
-        
+        /* Configuración de las "cajas invisibles" para escribir */
         input[type="text"], input[type="number"], input[type="email"] {
-            border: none; border-bottom: 1px solid #000; background-color: #fff9c4;
-            font-family: Arial, sans-serif; font-size: 9pt; font-weight: normal;
-            padding: 2px 5px; outline: none; flex-grow: 1; text-transform: uppercase;
-            margin-left: 5px; color: #000;
+            position: absolute;
+            z-index: 10;
+            background-color: rgba(255, 255, 0, 0.25); /* Tono amarillo para guiar en celular */
+            border: none;
+            outline: none;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            font-weight: bold;
+            color: #000;
+            padding: 0 5px;
+            text-transform: uppercase;
         }
-        
-        .w-rfc { width: 120px; flex-grow: 0 !important; }
-        .w-small { width: 60px; flex-grow: 0 !important; }
-        .w-med { width: 150px; flex-grow: 0 !important; }
 
-        /* CASILLAS DE VERIFICACIÓN */
-        .check-box { font-weight: normal; margin: 0 5px; font-size: 10pt; }
-        input[type="checkbox"] { transform: scale(1.3); margin: 0 5px; cursor: pointer; accent-color: #000; }
-
-        /* SECCIÓN DE FIRMA */
-        .signature-section { text-align: center; margin-top: 30px; font-size: 9pt; font-weight: bold; }
-        #canvas-firma { 
-            border: 1px dashed #999; 
-            background-color: #fff9c4; 
-            display: block; margin: 0 auto 5px auto; cursor: crosshair; touch-action: none;
-            width: 300px; height: 80px;
+        input[type="checkbox"] {
+            position: absolute;
+            z-index: 10;
+            transform: scale(1.5);
+            cursor: pointer;
         }
-        .signature-name { width: 350px; margin: 0 auto; line-height: 1.2; text-transform: uppercase; }
 
-        /* PIE DE PÁGINA */
-        .footer-text { font-size: 6.5pt; text-align: justify; margin-top: 30px; line-height: 1.2; color: #333; }
+        /* --- POSICIONES EXACTAS DE LOS CAMPOS (Basadas en tu imagen) --- */
+        /* Uso Exclusivo */
+        #uso_registro { top: 14.8%; left: 52%; width: 44%; }
+        #chk_verificacion { top: 16.5%; left: 47%; }
+        #chk_certificacion { top: 16.5%; left: 63%; }
 
-        /* SEGUNDA PÁGINA Y MAPA */
-        .map-container { margin-top: 20px; text-align: center; width: 100%; height: 500px; border: 1px solid #000; background: #eee;}
-        iframe { width: 100%; height: 100%; border: 0; }
+        /* Párrafo legal */
+        #parrafo_establecimiento { top: 27.2%; left: 9.5%; width: 23%; height: 1.5%; text-align: center; }
 
-        /* INTERFAZ MÓVIL (BOTONES) */
-        .controls { text-align: center; margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        button { padding: 10px 15px; font-size: 13px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; color: white; font-weight: bold; width: 90%; max-width: 250px;}
-        .btn-gps { background-color: #2e7d32; }
+        /* I. Datos Generales */
+        #chk_fisica { top: 33%; left: 19%; }
+        #chk_moral { top: 33%; left: 36%; }
+        #gral_rfc { top: 32.5%; left: 49%; width: 20%; }
+        #gral_nombre { top: 34.2%; left: 34.5%; width: 45%; }
+        #gral_calle { top: 35.8%; left: 15%; width: 20%; }
+        #gral_num { top: 35.8%; left: 42%; width: 10%; }
+        #gral_col { top: 35.8%; left: 71%; width: 24%; }
+        #gral_mun { top: 37.5%; left: 10%; width: 12%; }
+        #gral_est { top: 37.5%; left: 30%; width: 13%; }
+        #gral_cp { top: 37.5%; left: 48%; width: 8%; }
+        #gral_tel { top: 37.5%; left: 68%; width: 15%; }
+        #gral_correo { top: 39.2%; left: 18%; width: 35%; text-transform: lowercase; }
+
+        /* II. Datos del Establecimiento */
+        #est_razon { top: 44.8%; left: 23%; width: 25%; }
+        #est_calle { top: 48.2%; left: 7.5%; width: 17%; }
+        #est_num { top: 48.2%; left: 31%; width: 9%; }
+        #est_col { top: 48.2%; left: 56%; width: 18%; }
+        #est_mun { top: 48.2%; left: 83%; width: 14%; }
+        #est_est { top: 50%; left: 8%; width: 11%; }
+        #est_cp { top: 50%; left: 24%; width: 9%; }
+        #est_tel { top: 50%; left: 42%; width: 13%; }
+        #est_correo { top: 51.5%; left: 19%; width: 30%; text-transform: lowercase; }
+
+        /* Georreferenciación */
+        #geo_lat { top: 53.5%; left: 38%; width: 13%; text-align: center;}
+        #geo_lon { top: 53.5%; left: 55%; width: 13%; text-align: center;}
+        #chk_nacional { top: 56.5%; left: 43.5%; }
+        #chk_exportacion { top: 56.5%; left: 61%; } /* Ya tiene la X, pero ponemos el checkbox encima por si acaso */
+
+        #origen_prod { top: 65.5%; left: 26%; width: 40%; }
+        #area_sup { top: 67.5%; left: 24%; width: 12%; }
+        #volumen_prod { top: 69.5%; left: 32%; width: 12%; }
+
+        /* III. Firma */
+        #canvas-firma {
+            position: absolute;
+            z-index: 10;
+            top: 71%;
+            left: 28%;
+            width: 44%;
+            height: 6%;
+            border: 1px dashed #c0392b;
+            background-color: rgba(255, 255, 0, 0.1);
+            touch-action: none;
+            cursor: crosshair;
+        }
+        #nombre_firma { top: 76.5%; left: 28%; width: 44%; text-align: center; font-size: 14px; background: transparent;}
+        #lugar_fecha { top: 82.5%; left: 16%; width: 35%; }
+
+        /* Botones Flotantes */
+        .controles { text-align: center; margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; max-width: 800px; margin: 0 auto 20px auto; }
+        button { padding: 12px 15px; font-size: 14px; margin: 5px; cursor: pointer; border: none; border-radius: 5px; color: white; font-weight: bold; }
+        .btn-gps { background-color: #27ae60; }
         .btn-manual { background-color: #d35400; }
-        .btn-limpiar { background-color: #546e7a; }
-        .btn-pdf { background-color: #c62828; }
+        .btn-limpiar { background-color: #34495e; }
+        .btn-pdf { background-color: #c0392b; }
 
-        @media (max-width: 768px) {
-            #documento-pdf { width: 100%; padding: 15px; box-shadow: none; }
-            .row { flex-direction: column; align-items: flex-start; }
-            .inline-field, .inline-field-grow { width: 100%; margin-right: 0; margin-bottom: 8px; }
-            input[type="text"], input[type="number"], input[type="email"] { width: 100%; }
-            .exclusive-box { float: none; width: 100%; margin-top: 15px; }
-            .header-table td { display: block; width: 100% !important; text-align: center; margin-bottom: 10px; }
-            .banner-img { margin: 0 auto; }
-        }
+        /* Segunda página */
+        .pagina-mapa { width: 800px; margin: 20px auto 0 auto; background: white; padding: 20px; box-sizing: border-box; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        #mapa-iframe { width: 100%; height: 600px; border: 2px solid #000; background: #eee; margin-top: 10px;}
 
-        /* IMPRESIÓN / GUARDADO PDF NATIVO */
+        /* --- CONFIGURACIÓN DE IMPRESIÓN OFICIAL --- */
         @media print {
-            @page { size: letter; margin: 0; }
-            body { background-color: transparent; padding: 0; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
-            #documento-pdf { width: 21.59cm; min-height: 27.94cm; box-shadow: none; padding: 1.5cm 2cm; margin: 0; border: none; page-break-after: auto; }
-            .controls { display: none !important; }
+            body { background-color: #fff; padding: 0; margin: 0; -webkit-print-color-adjust: exact; color-adjust: exact; }
+            .controles { display: none !important; }
+            #documento-papel { box-shadow: none; margin: 0; border: none; }
+            .pagina-mapa { box-shadow: none; margin: 0; padding: 0; page-break-before: always; }
+            /* Quitar el fondo amarillo de los campos al generar PDF */
             input[type="text"], input[type="number"], input[type="email"] { background-color: transparent !important; }
-            #canvas-firma { background-color: transparent !important; border: none !important; } 
-            .row { flex-direction: row !important; align-items: flex-end !important; }
-            .inline-field, .inline-field-grow { width: auto !important; margin-bottom: 0 !important; }
-            .w-rfc { width: 120px !important; }
-            .w-small { width: 60px !important; }
-            .w-med { width: 150px !important; }
-            .exclusive-box { float: right !important; width: 220px !important; margin-top: 0 !important; }
-            .header-table td { display: table-cell !important; text-align: left !important; }
-            .banner-img { margin: 0; max-width: 500px !important; }
-            .page-break { page-break-before: always; }
+            #canvas-firma { background-color: transparent !important; border: none !important; }
         }
     </style>
 </head>
 <body>
 
-    <div class="controls" id="botones-control">
-        <button class="btn-gps" onclick="obtenerGPS()">📍 Obtener Mi Ubicación Actual</button>
-        <button class="btn-manual" onclick="actualizarMapaManual()">🗺️ Cargar Mapa desde Coordenadas</button>
+    <div class="controles">
+        <button class="btn-gps" onclick="obtenerGPS()">📍 Obtener GPS Actual</button>
+        <button class="btn-manual" onclick="ingresarCoordenadasManuales()">🗺️ Ingresar Coordenadas a Mano</button>
         <button class="btn-limpiar" onclick="limpiarFirma()">🧹 Borrar Firma</button>
-        <button class="btn-pdf" onclick="generarPDF()">📄 Guardar Documento Oficial (PDF)</button>
+        <button class="btn-pdf" onclick="window.print()">📄 Guardar PDF Oficial</button>
     </div>
 
-    <div id="documento-pdf">
-        <table class="header-table">
-            <tr>
-                <td style="width: 65%;">
-                    <img src="image_da5ed5.png" alt="Banner SENASICA" class="banner-img">
-                </td>
-                <td style="width: 35%; vertical-align: top;">
-                    <div class="exclusive-box">
-                        USO EXCLUSIVO DEL SENASICA<br>
-                        <div style="margin-top: 5px; margin-bottom: 5px; display: flex; align-items: flex-end;">
-                            NÚMERO DE REGISTRO: <input type="text" style="width: 80px; margin-left: 5px; font-weight: bold;">
-                        </div>
-                        VERIFICACIÓN [<input type="checkbox">]    CERTIFICACIÓN [<input type="checkbox">]
-                    </div>
-                </td>
-            </tr>
-        </table>
+    <div id="documento-papel">
+        <img src="image_5c6bdc.png" id="fondo-oficial" alt="Formato SENASICA">
 
-        <div class="director-name" style="margin-top: -10px;">
-            AVISO DE INICIO DE FUNCIONAMIENTO<br><br>
-            M.B. FRANCISCO RAMÍREZ Y RAMÍREZ<br>
-            DIRECTOR GENERAL DE SANIDAD VEGETAL
+        <input type="text" id="uso_registro">
+        <input type="checkbox" id="chk_verificacion">
+        <input type="checkbox" id="chk_certificacion">
+
+        <input type="text" id="parrafo_establecimiento">
+
+        <input type="checkbox" id="chk_fisica">
+        <input type="checkbox" id="chk_moral">
+        <input type="text" id="gral_rfc" maxlength="13">
+        <input type="text" id="gral_nombre">
+        <input type="text" id="gral_calle">
+        <input type="text" id="gral_num">
+        <input type="text" id="gral_col">
+        <input type="text" id="gral_mun">
+        <input type="text" id="gral_est">
+        <input type="text" id="gral_cp">
+        <input type="text" id="gral_tel">
+        <input type="email" id="gral_correo">
+
+        <input type="text" id="est_razon">
+        <input type="text" id="est_calle">
+        <input type="text" id="est_num">
+        <input type="text" id="est_col">
+        <input type="text" id="est_mun">
+        <input type="text" id="est_est">
+        <input type="text" id="est_cp">
+        <input type="text" id="est_tel">
+        <input type="email" id="est_correo">
+
+        <input type="text" id="geo_lat" placeholder="Latitud">
+        <input type="text" id="geo_lon" placeholder="Longitud">
+        
+        <input type="checkbox" id="chk_nacional">
+        <input type="checkbox" id="chk_exportacion" checked>
+
+        <input type="text" id="origen_prod">
+        <input type="number" step="0.01" id="area_sup">
+        <input type="number" step="0.01" id="volumen_prod">
+
+        <canvas id="canvas-firma" width="350" height="70"></canvas>
+        <input type="text" id="nombre_firma">
+        <input type="text" id="lugar_fecha">
+    </div>
+
+    <div class="pagina-mapa">
+        <h2 style="text-align: center; font-family: Arial;">ANEXO: UBICACIÓN SATELITAL</h2>
+        <div id="mapa-iframe">
+            <p style="text-align: center; color: #666; margin-top: 280px; font-family: Arial;">
+                <em>El mapa satelital aparecerá aquí al obtener las coordenadas.</em>
+            </p>
         </div>
-
-        <p class="legal-text">
-            EN CUMPLIMIENTO A LO DISPUESTO EN LOS ARTÍCULOS 7 FRACCIÓN XIX, 19 FRACCIONES I, INCISOS, F, G, K, M; Y VII, 37 BIS DE LA LEY FEDERAL DE SANIDAD VEGETAL; 91, 110, 111 Y 112 DEL REGLAMENTO DE LA LEY FEDERAL DE SANIDAD VEGETAL, PRESENTO EL AVISO DE INICIO DE FUNCIONAMIENTO DEL ESTABLECIMIENTO O DE LA UNIDAD DE PRODUCCIÓN COMERCIAL: 
-            <input type="text" style="width: 200px; text-align: center;">, CUYOS DATOS SE MENCIONAN A CONTINUACIÓN:
-        </p>
-
-        <div class="section-frame">
-            <h4>DATOS GENERALES:</h4>
-            <div class="row">
-                <div class="inline-field">1. PERSONA FÍSICA (<input type="checkbox">)    PERSONA MORAL (<input type="checkbox">)</div>
-                <div class="inline-field-grow">RFC: <input type="text" class="w-rfc" maxlength="13"></div>
-            </div>
-            <div class="row">
-                <div class="inline-field-grow">2. NOMBRE DEL PROPIETARIO O REPRESENTANTE LEGAL: <input type="text" id="nombre-arriba"></div>
-            </div>
-            <div class="row">
-                <div class="inline-field">3. DOMICILIO: CALLE: <input type="text" class="w-med"></div>
-                <div class="inline-field">NÚMERO: <input type="text" class="w-small"></div>
-                <div class="inline-field-grow">LOCALIDAD O COLONIA: <input type="text"></div>
-            </div>
-            <div class="row">
-                <div class="inline-field-grow">MUNICIPIO: <input type="text"></div>
-                <div class="inline-field-grow">ESTADO: <input type="text"></div>
-                <div class="inline-field">C.P.: <input type="number" class="w-small"></div>
-                <div class="inline-field">TELÉFONO: <input type="text" class="w-med"></div>
-            </div>
-            <div class="row">
-                <div class="inline-field-grow">CORREO ELECTRÓNICO: <input type="email" style="text-transform: lowercase;"></div>
-            </div>
-        </div>
-
-        <div class="section-frame">
-            <h4>DATOS DEL ESTABLECIMIENTO O UNIDAD DE PRODUCCIÓN COMERCIAL:</h4>
-            <div class="row">
-                <div class="inline-field-grow">1. NOMBRE O RAZÓN SOCIAL: <input type="text"></div>
-                <div class="inline-field">TELÉFONO: <input type="text" class="w-med"></div>
-            </div>
-            <div class="row">
-                <div class="inline-field">2. UBICACIÓN    CALLE: <input type="text" class="w-med"></div>
-                <div class="inline-field">NÚMERO: <input type="text" class="w-small"></div>
-                <div class="inline-field-grow">LOCALIDAD O COLONIA: <input type="text"></div>
-            </div>
-            <div class="row">
-                <div class="inline-field-grow">MUNICIPIO: <input type="text"></div>
-                <div class="inline-field-grow">ESTADO: <input type="text"></div>
-                <div class="inline-field">C.P.: <input type="number" class="w-small"></div>
-                <div class="inline-field-grow">CORREO ELECTRÓNICO: <input type="email" style="text-transform: lowercase;"></div>
-            </div>
-            <div class="row" style="margin-top: 20px;">
-                <div class="inline-field-grow"><strong>GEORREFERENCIACIÓN</strong>     LATITUD DE LA UNIDAD DE PRODUCCIÓN: 
-                    <input type="text" id="latitud_longitud" style="text-align: center; color: #000;" placeholder="Ej. 25.910650, -109.342458">
-                </div>
-            </div>
-            <div class="row" style="margin-top: 15px;">
-                <div class="inline-field">DESTINO:    NACIONAL (<input type="checkbox">)    EXPORTACIÓN (<input type="checkbox" checked>)</div>
-            </div>
-            <div class="row">
-                <div class="inline-field-grow">3. PRODUCTO (S) Y VARIEDAD (S): <span style="font-weight: normal; margin-left: 5px;">Sorghum bicolor (L.)</span></div>
-            </div>
-            <div class="row">
-                <div class="inline-field-grow">4. PLAGA (S) OBJETIVO: <span style="font-weight: normal; margin-left: 5px;">LAS INDICADAS EN EL PROTOCOLO DE EXPORTACIÓN DE SORGO A CHINA.</span></div>
-            </div>
-            <div class="row">
-                <div class="inline-field-grow">5. MEDIDA (S) FITOSANITARIA (S): <span style="font-weight: normal; margin-left: 5px;">LAS INDICADAS EN EL PROTOCOLO Y MANUAL DE EXPORTACIÓN DE SORGO A CHINA.</span></div>
-            </div>
-            <div class="row">
-                <div class="inline-field-grow">6. ORIGEN DEL PRODUCTO VEGETAL: <input type="text"></div>
-            </div>
-            <div class="row">
-                <div class="inline-field">7. ÁREA, SUPERFICIE O CAPACIDAD: <input type="number" step="0.01" class="w-small"></div>
-                <div class="inline-field-grow">VOLUMEN APROXIMADO DE PRODUCCIÓN: <input type="number" class="w-small"> TON</div>
-            </div>
-        </div>
-
-        <div class="signature-section">
-            BAJO PROTESTA DE DECIR VERDAD<br><br>
-            
-            <canvas id="canvas-firma"></canvas>
-            
-            <div style="display: flex; justify-content: center; margin-bottom: 5px;">
-                <input type="text" id="nombre-firma" placeholder="TECLEA EL NOMBRE AQUÍ" style="width: 300px; text-align: center; font-weight: bold; font-size: 10pt; margin-left: 0;">
-            </div>
-            
-            <div class="signature-name" style="width: 300px;">
-                NOMBRE Y FIRMA DEL PROPIETARIO<br>O REPRESENTANTE LEGAL
-            </div>
-            
-            <div class="row" style="justify-content: center; margin-top: 20px;">
-                <div class="inline-field">LUGAR Y FECHA: <input type="text" style="width: 350px; text-align: center;"></div>
-            </div>
-        </div>
-
-        <div class="footer-text">
-            ORIGINAL: INTERESADO, C.C.P. SUBDIRECCIÓN DE REGULACIÓN NACIONAL.<br>
-            ANEXAR IMÁGENES DEL ESTABLECIMIENTO AL REVERSO DE LA HOJA. LA AUTORIDAD SE RESERVA EL DERECHO DE REALIZAR VISITAS DE SUPERVISIÓN.<br><br>
-            EN CUMPLIMIENTO DE LA LEY FEDERAL DE PROTECCIÓN DE DATOS PERSONALES EN POSESIÓN DE LOS PARTICULARES Y SU REGLAMENTO, EL SENASICA, CON DOMICILIO EN BOULEVARD ADOLFO RUIZ CORTINES NO. 5010, COL INSURGENTES CUICUILCO, DELEGACIÓN COYOACAN, CIUDAD DE MÉXICO, C.P. 04530, ES RESPONSABLE DE RECABAR SUS DATOS PERSONALES, DEL USO QUE SE LE DE A LOS MISMOS Y DE SU PROTECCIÓN, EL AVISO DE PRIVACIDAD DEL SENASICA SE PUEDE CONSULTAR EN: https://www.gob.mx/senasica
-        </div>
-
-        <div class="page-break"></div>
-        <div style="margin-top: 2cm;">
-            <h4 style="text-align: center;">ANEXO: UBICACIÓN SATELITAL</h4>
-            <div class="map-container" id="mapa-iframe">
-                <p style="text-align: center; color: #666; margin-top: 200px; font-weight: normal; font-size: 10pt;">
-                    <em>El mapa satelital se cargará aquí al presionar uno de los botones de coordenadas.</em>
-                </p>
-            </div>
-        </div>
-
     </div>
 
     <script>
-        // Sincronizar el nombre de arriba con el de la firma automáticamente
-        const inputNombreArriba = document.getElementById('nombre-arriba');
-        const inputNombreFirma = document.getElementById('nombre-firma');
+        // Sincronizar nombre (Datos Generales -> Firma)
+        const inputGralNombre = document.getElementById('gral_nombre');
+        const inputNombreFirma = document.getElementById('nombre_firma');
+        inputGralNombre.addEventListener('input', () => { inputNombreFirma.value = inputGralNombre.value; });
+        inputNombreFirma.addEventListener('input', () => { inputGralNombre.value = inputNombreFirma.value; });
 
-        inputNombreArriba.addEventListener('input', function() {
-            inputNombreFirma.value = this.value;
-        });
-
-        inputNombreFirma.addEventListener('input', function() {
-            inputNombreArriba.value = this.value;
-        });
-
-        // Funciones de dibujo de firma
+        // Lógica de dibujo para la firma en el canvas
         const canvas = document.getElementById('canvas-firma');
         const ctx = canvas.getContext('2d');
         let dibujando = false;
 
-        function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.strokeStyle = '#000000';
-        }
-        window.addEventListener('load', resizeCanvas);
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#000000'; // Tinta negra
 
         function obtenerPosicion(e) {
             const rect = canvas.getBoundingClientRect();
+            // Escala ajustada por si el usuario hace zoom en el celular
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
             let x = e.clientX || (e.touches && e.touches[0].clientX);
             let y = e.clientY || (e.touches && e.touches[0].clientY);
-            return { x: x - rect.left, y: y - rect.top };
+            return { x: (x - rect.left) * scaleX, y: (y - rect.top) * scaleY };
         }
 
         function iniciarDibujo(e) { e.preventDefault(); dibujando = true; const pos = obtenerPosicion(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); }
@@ -319,49 +245,41 @@
 
         function limpiarFirma() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-        // Función 1: Obtener GPS del dispositivo
+        // --- Lógica de Coordenadas y Mapa ---
         function obtenerGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(pos => {
-                    const lat = pos.coords.latitude;
-                    const lon = pos.coords.longitude;
-                    document.getElementById('latitud_longitud').value = `${lat}, ${lon}`;
-                    cargarIframeMapa(lat, lon);
-                    alert("¡Ubicación y mapa cargados exitosamente!");
-                }, () => {
-                    alert("Por favor, asegúrate de tener el GPS activado y dar permisos al navegador.");
-                });
-            } else {
-                alert("Tu dispositivo no soporta geolocalización.");
+                    const lat = pos.coords.latitude.toFixed(6);
+                    const lon = pos.coords.longitude.toFixed(6);
+                    
+                    document.getElementById('geo_lat').value = lat;
+                    document.getElementById('geo_lon').value = lon;
+                    cargarMapaSatelital(lat, lon);
+                    alert("¡Ubicación cargada con éxito!");
+                }, () => { alert("Error: Verifica que el GPS esté encendido y Chrome/Safari tenga permiso de ubicación."); });
+            } else { alert("Tu dispositivo no soporta geolocalización."); }
+        }
+
+        function ingresarCoordenadasManuales() {
+            // Pedimos las coordenadas mediante una ventana emergente para que sea más fácil de pegar
+            let coords = prompt("Pega las coordenadas aquí (Latitud, Longitud):\nEjemplo: 25.910650, -109.342458");
+            if (coords && coords.includes(',')) {
+                let partes = coords.split(',');
+                let lat = partes[0].trim();
+                let lon = partes[1].trim();
+                
+                document.getElementById('geo_lat').value = lat;
+                document.getElementById('geo_lon').value = lon;
+                cargarMapaSatelital(lat, lon);
+                alert("Mapa actualizado correctamente.");
+            } else if (coords) {
+                alert("Formato incorrecto. Asegúrate de separar la latitud y longitud con una coma.");
             }
         }
 
-        // Función 2: Cargar mapa leyendo lo que el usuario escribió en el campo de texto
-        function actualizarMapaManual() {
-            const inputCoords = document.getElementById('latitud_longitud').value;
-            
-            if (!inputCoords || !inputCoords.includes(',')) {
-                alert("Por favor, escribe primero las coordenadas en el campo de Georreferenciación.\nFormato: Latitud, Longitud\nEjemplo: 25.910650, -109.342458");
-                return;
-            }
-
-            const partes = inputCoords.split(',');
-            const lat = partes[0].trim();
-            const lon = partes[1].trim();
-
-            cargarIframeMapa(lat, lon);
-            alert("¡Mapa actualizado con las coordenadas que ingresaste!");
-        }
-
-        // Función centralizada para mostrar el mapa satelital de Google
-        function cargarIframeMapa(lat, lon) {
-            const urlMapa = `https://maps.google.com/maps?q=${lat},${lon}&t=k&z=17&output=embed`;
-            document.getElementById('mapa-iframe').innerHTML = `<iframe src="${urlMapa}" frameborder="0"></iframe>`;
-        }
-
-        // Impresión a PDF Nativa
-        function generarPDF() {
-            window.print();
+        function cargarMapaSatelital(lat, lon) {
+            const urlMapa = `https://maps.google.com/maps?q=$${lat},${lon}&t=k&z=17&output=embed`;
+            document.getElementById('mapa-iframe').innerHTML = `<iframe src="${urlMapa}" frameborder="0" style="width:100%; height:100%;"></iframe>`;
         }
     </script>
 </body>
