@@ -40,7 +40,7 @@
 
     <div class="contenedor">
         <h2>Formato SENASICA</h2>
-        <p class="instrucciones">Llena los datos a continuación. Al presionar "Generar Documento", se estamparán perfectamente sobre el PDF original.</p>
+        <p class="instrucciones">Llena los datos. Al presionar "Generar Documento", se generará el PDF.</p>
 
         <div class="seccion">
             <div class="seccion-titulo">DATOS DE CABECERA</div>
@@ -263,7 +263,7 @@
                 estampar('cp_est', 177, 394);
                 
                 const correoEst = document.getElementById('correo_est').value.toLowerCase();
-                pagina.drawText(correoEst, { x: 165, y: 473, size: size, font: font });
+                pagina.drawText(correoEst, { x: 165, y: 383, size: size, font: font });
 
                 // GEORREFERENCIACIÓN
                 const coordsStr = document.getElementById('latitud').value + ", " + document.getElementById('longitud').value;
