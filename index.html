@@ -34,9 +34,20 @@
         .btn-gps { background-color: #2e7d32; }
         .btn-limpiar { background-color: #7f8c8d; }
         .btn-pdf { background-color: #c62828; margin-top: 20px; font-size: 16px; padding: 15px; }
+
+        /* NUEVO: Estilos para la pantalla de carga */
+        #pantalla-carga { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
+        .spinner { width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid #e67e22; border-radius: 50%; animation: girar 1s linear infinite; margin-bottom: 20px; }
+        @keyframes girar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+
+    <div id="pantalla-carga">
+        <div class="spinner"></div>
+        <h2 style="color: white; margin-bottom: 10px;">Generando Documento Oficial...</h2>
+        <p style="font-size: 14px; max-width: 400px;">Por favor espera un momento. Se están procesando las coordenadas y optimizando las fotografías para el PDF.</p>
+    </div>
 
     <div class="contenedor">
         <h2>Formato SENASICA</h2>
@@ -230,6 +241,13 @@
 
         // --- ESTAMPAR TEXTOS EN EL PDF ---
         async function llenarYDescargarPDF() {
+            // NUEVO: Mostrar la pantalla de carga inmediatamente
+            const pantallaCarga = document.getElementById('pantalla-carga');
+            pantallaCarga.style.display = 'flex';
+            
+            // Pausa minúscula para permitir que el navegador dibuje la pantalla de carga antes de procesar
+            await new Promise(resolve => setTimeout(resolve, 50));
+
             try {
                 const urlPDF = 'formato_vacio.pdf'; 
                 const existingPdfBytes = await fetch(urlPDF).then(res => res.arrayBuffer());
@@ -334,8 +352,7 @@
                     page2.drawText(urlGoogleMaps, { x: 50, y: 610, size: 10, font: font, color: PDFLib.rgb(0, 0, 1) });
 
                     // =========================================================================
-                    // ESTO ES LO ÚNICO NUEVO: INSERTA EL MAPA EN EL PDF SIN TOCAR GOOGLE MAPS
-                    // ESTE CÓDIGO ES EXACTAMENTE EL QUE ME DISTE, INTACTO
+                    // INSERTA EL MAPA EN EL PDF SIN TOCAR GOOGLE MAPS
                     // =========================================================================
                     try {
                         const latNum = parseFloat(lat);
@@ -433,6 +450,9 @@
             } catch (error) {
                 console.error(error);
                 alert("Hubo un error al generar el PDF. Verifica que el archivo 'formato_vacio.pdf' esté en la misma carpeta e inténtalo de nuevo.");
+            } finally {
+                // NUEVO: Ocultar la pantalla de carga al terminar (ya sea con éxito o error)
+                pantallaCarga.style.display = 'none';
             }
         }
     </script>
