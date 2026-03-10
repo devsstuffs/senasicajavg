@@ -443,7 +443,7 @@
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
                 
-                const nombreDescarga = nombreFirma ? `SENASICA_${nombreFirma.replace(/ /g, '_')}.pdf` : `Aviso_SENASICA.pdf`;
+                const nombreDescarga = nombreFirma ? `reg_sorgo_${nombreFirma.replace(/ /g, '_')}.pdf` : `Aviso_SENASICA.pdf`;
                 link.download = nombreDescarga;
                 link.click();
 
