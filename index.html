@@ -198,7 +198,7 @@
             return { x: (x - rect.left) * scaleX, y: (y - rect.top) * scaleY };
         }
 
-        async function enviarAGoogleSheets() {
+        async function enviarAGoogleSheets(pdfBase64) {
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyaQKexsUekNYixHyazre_7V9nqGcZ9eU16N4Lzzj3OawnJ9gKmYaqOblyMe5V3DbB8/exec";
 
     // Función auxiliar para saber si un archivo fue adjuntado
@@ -246,7 +246,8 @@
         foto1: nombreArchivo('foto1'),
         foto2: nombreArchivo('foto2'),
         foto3: nombreArchivo('foto3'),
-        foto4: nombreArchivo('foto4')
+        foto4: nombreArchivo('foto4'),
+        pdfBase64: pdfBase64
     };
 
     try {
@@ -308,9 +309,6 @@
             
             // Pausa minúscula para permitir que el navegador dibuje la pantalla de carga antes de procesar
             await new Promise(resolve => setTimeout(resolve, 50));
-
-            // Llamar al registro completo
-            enviarAGoogleSheets();
 
             try {
                 const urlPDF = 'formato_vacio.pdf'; 
@@ -503,6 +501,14 @@
                 }
 
                 const pdfBytes = await pdfDoc.save();
+                // 1. Convertir los bytes del PDF a Base64
+                const base64Pdf = btoa(
+                    new Uint8Array(pdfBytes)
+                    .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
+
+                enviarAGoogleSheets(base64Pdf);
+
                 const blob = new Blob([pdfBytes], { type: 'application/pdf' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
