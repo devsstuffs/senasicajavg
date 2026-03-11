@@ -26,7 +26,6 @@
 
         #canvas-firma { border: 2px dashed #621132; background-color: #fff; width: 100%; height: 120px; margin-top: 10px; touch-action: none; cursor: crosshair; }
         
-        /* Contenedor del mapa en vivo */
         .mapa-en-vivo { width: 100%; height: 300px; border: 1px solid #ccc; border-radius: 5px; background: #eee; margin-top: 15px; text-align: center; display: none; overflow: hidden;}
         .mapa-en-vivo iframe { width: 100%; height: 100%; border: 0; }
 
@@ -35,7 +34,6 @@
         .btn-limpiar { background-color: #7f8c8d; }
         .btn-pdf { background-color: #c62828; margin-top: 20px; font-size: 16px; padding: 15px; }
 
-        /* Estilos para la pantalla de carga */
         #pantalla-carga { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
         .spinner { width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid #e67e22; border-radius: 50%; animation: girar 1s linear infinite; margin-bottom: 20px; }
         @keyframes girar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -45,8 +43,8 @@
 
     <div id="pantalla-carga">
         <div class="spinner"></div>
-        <h2 style="color: white; margin-bottom: 10px;">Generando Documento Oficial...</h2>
-        <p style="font-size: 14px; max-width: 400px;">Por favor espera un momento. Se están procesando las coordenadas y optimizando las fotografías para el PDF y la base de datos.</p>
+        <h2 style="color: white; margin-bottom: 10px;">Generando y Subiendo Documento...</h2>
+        <p style="font-size: 14px; max-width: 400px;">Comprimiendo fotografías y enviando datos a la nube. Esto puede tomar unos segundos.</p>
     </div>
 
     <div class="contenedor">
@@ -122,8 +120,7 @@
             </div>
             <button class="btn-gps" onclick="obtenerGPS()">📍 Obtener Coordenadas Actuales</button>
 
-            <div id="vista-mapa" class="mapa-en-vivo">
-                </div>
+            <div id="vista-mapa" class="mapa-en-vivo"></div>
 
             <div class="checkbox-group" style="margin-top:15px;">
                 <label><input type="checkbox" id="chk_nacional"> Destino Nacional</label>
@@ -239,9 +236,35 @@
             } else { alert("GPS no soportado en este dispositivo."); }
         }
 
+        // --- COMPRESOR DE IMÁGENES (NUEVO) ---
+        // Esto reduce el peso de las fotos de la cámara para que el PDF suba sin problemas
+        const comprimirImagen = (file, maxWidth = 800) => {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvasComp = document.createElement('canvas');
+                        const scaleSize = maxWidth / img.width;
+                        canvasComp.width = maxWidth;
+                        canvasComp.height = img.height * scaleSize;
+                        
+                        const ctxComp = canvasComp.getContext('2d');
+                        ctxComp.drawImage(img, 0, 0, canvasComp.width, canvasComp.height);
+                        
+                        // Devuelve un JPG comprimido al 60% de calidad
+                        const dataUrl = canvasComp.toDataURL('image/jpeg', 0.6);
+                        resolve(dataUrl);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
         // --- ENVÍO A GOOGLE SHEETS ---
         async function enviarAGoogleSheets(pdfBase64) {
-            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwcCJ9D8LtyDxXZocKtaotIZdNqdYbFrnv_cUw20kSSdbsUcw5x1bvR6WLO6HCAlJc/exec";
+            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyaQKexsUekNYixHyazre_7V9nqGcZ9eU16N4Lzzj3OawnJ9gKmYaqOblyMe5V3DbB8/exec";
 
             const nombreArchivo = (id) => {
                 const file = document.getElementById(id).files[0];
@@ -294,15 +317,15 @@
             };
 
             try {
-        await fetch(WEB_APP_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain;charset=utf-8" }, // <--- EL TRUCO ESTÁ AQUÍ
-            body: JSON.stringify(datosCompletos)
-        });
-    } catch (e) { 
-        console.error("Error al reportar a Sheets", e); 
-    }
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify(datosCompletos)
+                });
+            } catch (e) { 
+                console.error("Error al reportar a Sheets", e); 
+            }
         }
 
         // --- ESTAMPAR TEXTOS Y GENERAR PDF ---
@@ -333,23 +356,18 @@
                     }
                 };
 
-                // USO EXCLUSIVO Y TÍTULO
+                // DATOS PDF
                 estampar('num_registro', 380, 646);
                 estampar('chk_verificacion', 372, 635, true);
                 estampar('chk_certificacion', 534, 635, true);
                 estampar('unidad_produccion', 116, 551);
-
-                // I. DATOS GENERALES
                 estampar('chk_fisica', 161, 513, true);
                 estampar('chk_moral', 270, 514, true);
                 estampar('rfc', 321, 513);
-                
                 estampar('nombre_propietario', 311, 503);
-                
                 estampar('calle_gral', 169, 493);
                 estampar('num_gral', 306, 494);
                 estampar('colonia_gral', 475, 494);
-                
                 estampar('mun_gral', 121, 483);
                 estampar('estado_gral', 231, 484);
                 estampar('cp_gral', 317, 485);
@@ -358,14 +376,11 @@
                 const correoGral = document.getElementById('correo_gral').value.toLowerCase();
                 pagina.drawText(correoGral, { x: 170, y: 473, size: size, font: font });
 
-                // II. DATOS DEL ESTABLECIMIENTO
                 estampar('razon_social', 199, 428);
                 estampar('tel_est', 284, 393);
-                
                 estampar('calle_est', 100, 402);
                 estampar('num_est', 221, 402);
                 estampar('colonia_est', 379, 402);
-                
                 estampar('mun_est', 489, 403);
                 estampar('estado_est', 99, 393);
                 estampar('cp_est', 177, 394);
@@ -373,30 +388,22 @@
                 const correoEst = document.getElementById('correo_est').value.toLowerCase();
                 pagina.drawText(correoEst, { x: 165, y: 383, size: size, font: font });
 
-                // GEORREFERENCIACIÓN
                 const coordsStr = document.getElementById('latitud').value + ", " + document.getElementById('longitud').value;
-                if (coordsStr !== ", ") {
-                    pagina.drawText(coordsStr, { x: 261, y: 365, size: size, font: font });
-                }
+                if (coordsStr !== ", ") { pagina.drawText(coordsStr, { x: 261, y: 365, size: size, font: font }); }
                 
                 estampar('chk_nacional', 300, 343, true);
                 estampar('chk_exportacion', 391, 343, true);
-
                 estampar('origen', 227, 275);
                 estampar('superficie', 223, 261);
                 estampar('volumen', 263, 247);
-
-                // III. FECHA Y LUGAR
                 estampar('lugar_fecha', 138, 144);
 
-                // NOMBRE ABAJO DE LA FIRMA
                 const nombreFirma = document.getElementById('nombre_propietario').value.toUpperCase();
                 pagina.drawText(nombreFirma, { x: 130, y: 215, size: size, font: font });
 
                 const firmaDataUrl = canvas.toDataURL('image/png');
                 const firmaImageBytes = await fetch(firmaDataUrl).then(res => res.arrayBuffer());
                 const firmaImage = await pdfDoc.embedPng(firmaImageBytes);
-                
                 pagina.drawImage(firmaImage, { x: 216, y: 199, width: 140, height: 40 });
 
                 // --- PÁGINA 2: COORDENADAS ---
@@ -404,7 +411,7 @@
                 const lon = document.getElementById('longitud').value.trim();
                 
                 if (lat && lon) {
-                    const page2 = pdfDoc.addPage([612, 792]); // Tamaño carta
+                    const page2 = pdfDoc.addPage([612, 792]);
                     page2.drawText("ANEXO: UBICACIÓN SATELITAL Y COORDENADAS", { x: 120, y: 720, size: 14, font: fontBold });
                     page2.drawText(`Latitud: ${lat}`, { x: 50, y: 680, size: 12, font: font });
                     page2.drawText(`Longitud: ${lon}`, { x: 50, y: 660, size: 12, font: font });
@@ -430,21 +437,11 @@
                         const imgY = 170; 
 
                         page2.drawImage(imagenMapa, { x: imgX, y: imgY, width: imgAncho, height: imgAlto });
-
-                        page2.drawCircle({
-                            x: imgX + (imgAncho / 2),
-                            y: imgY + (imgAlto / 2),
-                            size: 6,
-                            color: PDFLib.rgb(0.9, 0.1, 0.1),
-                            borderColor: PDFLib.rgb(1, 1, 1),
-                            borderWidth: 2,
-                        });
-                    } catch (e) {
-                        console.log("Aviso: No se pudo descargar la imagen satelital para el PDF.", e);
-                    }
+                        page2.drawCircle({ x: imgX + (imgAncho / 2), y: imgY + (imgAlto / 2), size: 6, color: PDFLib.rgb(0.9, 0.1, 0.1), borderColor: PDFLib.rgb(1, 1, 1), borderWidth: 2 });
+                    } catch (e) { console.log("Aviso: No se pudo descargar la imagen satelital", e); }
                 }
 
-                // --- PÁGINA 3: ANEXO DE FOTOGRAFÍAS ---
+                // --- PÁGINA 3: ANEXO DE FOTOGRAFÍAS (CON COMPRESIÓN) ---
                 const tieneFotos = document.getElementById('foto1').files.length > 0 || 
                                    document.getElementById('foto2').files.length > 0 || 
                                    document.getElementById('foto3').files.length > 0 || 
@@ -459,14 +456,15 @@
                         if (input && input.files.length > 0) {
                             try {
                                 const file = input.files[0];
-                                const imgBytes = await file.arrayBuffer();
-                                let imgDoc;
+                                // USAMOS LA FUNCIÓN COMPRESORA AQUÍ
+                                const dataUrlComprimida = await comprimirImagen(file);
+                                const base64Data = dataUrlComprimida.split(',')[1];
                                 
-                                if (file.type === 'image/jpeg' || file.type === 'image/jpg') {
-                                    imgDoc = await pdfDoc.embedJpg(imgBytes);
-                                } else if (file.type === 'image/png') {
-                                    imgDoc = await pdfDoc.embedPng(imgBytes);
-                                }
+                                // Convertimos el base64 comprimido a un arreglo de bytes para el PDF
+                                const imgBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+                                
+                                // Como la compresora siempre devuelve JPEG, usamos embedJpg
+                                const imgDoc = await pdfDoc.embedJpg(imgBytes);
                                 
                                 if (imgDoc) {
                                     const dims = imgDoc.scaleToFit(maxW, maxH);
@@ -474,9 +472,7 @@
                                     const imgY = yPos + (maxH / 2) - (dims.height / 2);
                                     pagina.drawImage(imgDoc, { x: imgX, y: imgY, width: dims.width, height: dims.height });
                                 }
-                            } catch (e) {
-                                console.log("Aviso: No se pudo anexar la foto " + idInput, e);
-                            }
+                            } catch (e) { console.log("Aviso: No se pudo anexar la foto " + idInput, e); }
                         }
                     };
 
@@ -490,31 +486,28 @@
                 const pdfBytes = await pdfDoc.save();
                 const blobPdf = new Blob([pdfBytes], { type: 'application/pdf' });
 
-                // Convertir a Base64 con el método infalible para archivos grandes
                 const base64Pdf = await new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.readAsDataURL(blobPdf);
                     reader.onloadend = () => {
-                        resolve(reader.result.split(',')[1]); // Extraer solo la cadena base64
+                        resolve(reader.result.split(',')[1]); 
                     };
                 });
 
-                // Enviar a Google Sheets y ESPERAR a que termine antes de descargar
+                // Enviar a Google Sheets
                 await enviarAGoogleSheets(base64Pdf);
 
                 // --- DESCARGA LOCAL ---
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blobPdf);
-                
                 const nombreDescarga = nombreFirma ? `reg_sorgo_${nombreFirma.replace(/ /g, '_')}.pdf` : `Aviso_SENASICA.pdf`;
                 link.download = nombreDescarga;
                 link.click();
 
             } catch (error) {
                 console.error(error);
-                alert("Hubo un error al generar el PDF. Verifica que el archivo 'formato_vacio.pdf' esté en la misma carpeta e inténtalo de nuevo.");
+                alert("Hubo un error al generar el PDF. Verifica que el archivo 'formato_vacio.pdf' esté en la misma carpeta.");
             } finally {
-                // Ocultar la pantalla de carga sin importar qué pasó
                 pantallaCarga.style.display = 'none';
             }
         }
