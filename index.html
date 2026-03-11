@@ -198,6 +198,67 @@
             return { x: (x - rect.left) * scaleX, y: (y - rect.top) * scaleY };
         }
 
+        async function enviarAGoogleSheets() {
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyaQKexsUekNYixHyazre_7V9nqGcZ9eU16N4Lzzj3OawnJ9gKmYaqOblyMe5V3DbB8/exec";
+
+    // Función auxiliar para saber si un archivo fue adjuntado
+    const nombreArchivo = (id) => {
+        const file = document.getElementById(id).files[0];
+        return file ? file.name : "No adjunta";
+    };
+
+    const datosCompletos = {
+        unidad_produccion: document.getElementById('unidad_produccion').value,
+        num_registro: document.getElementById('num_registro').value,
+        chk_verificacion: document.getElementById('chk_verificacion').checked ? "SI" : "NO",
+        chk_certificacion: document.getElementById('chk_certificacion').checked ? "SI" : "NO",
+        chk_fisica: document.getElementById('chk_fisica').checked ? "SI" : "NO",
+        chk_moral: document.getElementById('chk_moral').checked ? "SI" : "NO",
+        rfc: document.getElementById('rfc').value,
+        nombre_propietario: document.getElementById('nombre_propietario').value,
+        calle_gral: document.getElementById('calle_gral').value,
+        num_gral: document.getElementById('num_gral').value,
+        colonia_gral: document.getElementById('colonia_gral').value,
+        mun_gral: document.getElementById('mun_gral').value,
+        estado_gral: document.getElementById('estado_gral').value,
+        cp_gral: document.getElementById('cp_gral').value,
+        tel_gral: document.getElementById('tel_gral').value,
+        correo_gral: document.getElementById('correo_gral').value,
+        razon_social: document.getElementById('razon_social').value,
+        calle_est: document.getElementById('calle_est').value,
+        num_est: document.getElementById('num_est').value,
+        colonia_est: document.getElementById('colonia_est').value,
+        mun_est: document.getElementById('mun_est').value,
+        estado_est: document.getElementById('estado_est').value,
+        cp_est: document.getElementById('cp_est').value,
+        tel_est: document.getElementById('tel_est').value,
+        correo_est: document.getElementById('correo_est').value,
+        latitud: document.getElementById('latitud').value,
+        longitud: document.getElementById('longitud').value,
+        enlace_mapa: `https://www.google.com/maps?q=${document.getElementById('latitud').value},${document.getElementById('longitud').value}`,
+        chk_nacional: document.getElementById('chk_nacional').checked ? "SI" : "NO",
+        chk_exportacion: document.getElementById('chk_exportacion').checked ? "SI" : "NO",
+        origen: document.getElementById('origen').value,
+        superficie: document.getElementById('superficie').value,
+        volumen: document.getElementById('volumen').value,
+        lugar_fecha: document.getElementById('lugar_fecha').value,
+        // Guardamos el nombre del archivo para saber que se tomó la evidencia
+        foto1: nombreArchivo('foto1'),
+        foto2: nombreArchivo('foto2'),
+        foto3: nombreArchivo('foto3'),
+        foto4: nombreArchivo('foto4')
+    };
+
+    try {
+        await fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(datosCompletos)
+        });
+    } catch (e) { console.error("Error al reportar a Sheets", e); }
+}
+
         canvas.addEventListener('mousedown', (e) => { dibujando = true; ctx.beginPath(); ctx.moveTo(obtenerPos(e).x, obtenerPos(e).y); });
         canvas.addEventListener('mousemove', (e) => { if(dibujando) { ctx.lineTo(obtenerPos(e).x, obtenerPos(e).y); ctx.stroke(); } });
         canvas.addEventListener('mouseup', () => dibujando = false);
@@ -247,6 +308,9 @@
             
             // Pausa minúscula para permitir que el navegador dibuje la pantalla de carga antes de procesar
             await new Promise(resolve => setTimeout(resolve, 50));
+
+            // Llamar al registro completo
+            enviarAGoogleSheets();
 
             try {
                 const urlPDF = 'formato_vacio.pdf'; 
