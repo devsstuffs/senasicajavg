@@ -294,15 +294,15 @@
             };
 
             try {
-                await fetch(WEB_APP_URL, {
-                    method: "POST",
-                    mode: "no-cors",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(datosCompletos)
-                });
-            } catch (e) { 
-                console.error("Error al reportar a Sheets", e); 
-            }
+        await fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" }, // <--- EL TRUCO ESTÁ AQUÍ
+            body: JSON.stringify(datosCompletos)
+        });
+    } catch (e) { 
+        console.error("Error al reportar a Sheets", e); 
+    }
         }
 
         // --- ESTAMPAR TEXTOS Y GENERAR PDF ---
