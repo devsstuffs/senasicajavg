@@ -35,7 +35,7 @@
         .btn-limpiar { background-color: #7f8c8d; }
         .btn-pdf { background-color: #c62828; margin-top: 20px; font-size: 16px; padding: 15px; }
 
-        /* NUEVO: Estilos para la pantalla de carga */
+        /* Estilos para la pantalla de carga */
         #pantalla-carga { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 9999; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center; padding: 20px; box-sizing: border-box; }
         .spinner { width: 60px; height: 60px; border: 6px solid #f3f3f3; border-top: 6px solid #e67e22; border-radius: 50%; animation: girar 1s linear infinite; margin-bottom: 20px; }
         @keyframes girar { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -46,7 +46,7 @@
     <div id="pantalla-carga">
         <div class="spinner"></div>
         <h2 style="color: white; margin-bottom: 10px;">Generando Documento Oficial...</h2>
-        <p style="font-size: 14px; max-width: 400px;">Por favor espera un momento. Se están procesando las coordenadas y optimizando las fotografías para el PDF.</p>
+        <p style="font-size: 14px; max-width: 400px;">Por favor espera un momento. Se están procesando las coordenadas y optimizando las fotografías para el PDF y la base de datos.</p>
     </div>
 
     <div class="contenedor">
@@ -198,68 +198,6 @@
             return { x: (x - rect.left) * scaleX, y: (y - rect.top) * scaleY };
         }
 
-        async function enviarAGoogleSheets(pdfBase64) {
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyaQKexsUekNYixHyazre_7V9nqGcZ9eU16N4Lzzj3OawnJ9gKmYaqOblyMe5V3DbB8/exec";
-
-    // Función auxiliar para saber si un archivo fue adjuntado
-    const nombreArchivo = (id) => {
-        const file = document.getElementById(id).files[0];
-        return file ? file.name : "No adjunta";
-    };
-
-    const datosCompletos = {
-        unidad_produccion: document.getElementById('unidad_produccion').value,
-        num_registro: document.getElementById('num_registro').value,
-        chk_verificacion: document.getElementById('chk_verificacion').checked ? "SI" : "NO",
-        chk_certificacion: document.getElementById('chk_certificacion').checked ? "SI" : "NO",
-        chk_fisica: document.getElementById('chk_fisica').checked ? "SI" : "NO",
-        chk_moral: document.getElementById('chk_moral').checked ? "SI" : "NO",
-        rfc: document.getElementById('rfc').value,
-        nombre_propietario: document.getElementById('nombre_propietario').value,
-        calle_gral: document.getElementById('calle_gral').value,
-        num_gral: document.getElementById('num_gral').value,
-        colonia_gral: document.getElementById('colonia_gral').value,
-        mun_gral: document.getElementById('mun_gral').value,
-        estado_gral: document.getElementById('estado_gral').value,
-        cp_gral: document.getElementById('cp_gral').value,
-        tel_gral: document.getElementById('tel_gral').value,
-        correo_gral: document.getElementById('correo_gral').value,
-        razon_social: document.getElementById('razon_social').value,
-        calle_est: document.getElementById('calle_est').value,
-        num_est: document.getElementById('num_est').value,
-        colonia_est: document.getElementById('colonia_est').value,
-        mun_est: document.getElementById('mun_est').value,
-        estado_est: document.getElementById('estado_est').value,
-        cp_est: document.getElementById('cp_est').value,
-        tel_est: document.getElementById('tel_est').value,
-        correo_est: document.getElementById('correo_est').value,
-        latitud: document.getElementById('latitud').value,
-        longitud: document.getElementById('longitud').value,
-        enlace_mapa: `https://www.google.com/maps?q=${document.getElementById('latitud').value},${document.getElementById('longitud').value}`,
-        chk_nacional: document.getElementById('chk_nacional').checked ? "SI" : "NO",
-        chk_exportacion: document.getElementById('chk_exportacion').checked ? "SI" : "NO",
-        origen: document.getElementById('origen').value,
-        superficie: document.getElementById('superficie').value,
-        volumen: document.getElementById('volumen').value,
-        lugar_fecha: document.getElementById('lugar_fecha').value,
-        // Guardamos el nombre del archivo para saber que se tomó la evidencia
-        foto1: nombreArchivo('foto1'),
-        foto2: nombreArchivo('foto2'),
-        foto3: nombreArchivo('foto3'),
-        foto4: nombreArchivo('foto4'),
-        pdfBase64: pdfBase64
-    };
-
-    try {
-        await fetch(WEB_APP_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(datosCompletos)
-        });
-    } catch (e) { console.error("Error al reportar a Sheets", e); }
-}
-
         canvas.addEventListener('mousedown', (e) => { dibujando = true; ctx.beginPath(); ctx.moveTo(obtenerPos(e).x, obtenerPos(e).y); });
         canvas.addEventListener('mousemove', (e) => { if(dibujando) { ctx.lineTo(obtenerPos(e).x, obtenerPos(e).y); ctx.stroke(); } });
         canvas.addEventListener('mouseup', () => dibujando = false);
@@ -301,13 +239,77 @@
             } else { alert("GPS no soportado en este dispositivo."); }
         }
 
-        // --- ESTAMPAR TEXTOS EN EL PDF ---
+        // --- ENVÍO A GOOGLE SHEETS ---
+        async function enviarAGoogleSheets(pdfBase64) {
+            const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyaQKexsUekNYixHyazre_7V9nqGcZ9eU16N4Lzzj3OawnJ9gKmYaqOblyMe5V3DbB8/exec";
+
+            const nombreArchivo = (id) => {
+                const file = document.getElementById(id).files[0];
+                return file ? file.name : "No adjunta";
+            };
+
+            const lat = document.getElementById('latitud').value.trim();
+            const lon = document.getElementById('longitud').value.trim();
+
+            const datosCompletos = {
+                unidad_produccion: document.getElementById('unidad_produccion').value,
+                num_registro: document.getElementById('num_registro').value,
+                chk_verificacion: document.getElementById('chk_verificacion').checked ? "SI" : "NO",
+                chk_certificacion: document.getElementById('chk_certificacion').checked ? "SI" : "NO",
+                chk_fisica: document.getElementById('chk_fisica').checked ? "SI" : "NO",
+                chk_moral: document.getElementById('chk_moral').checked ? "SI" : "NO",
+                rfc: document.getElementById('rfc').value,
+                nombre_propietario: document.getElementById('nombre_propietario').value,
+                calle_gral: document.getElementById('calle_gral').value,
+                num_gral: document.getElementById('num_gral').value,
+                colonia_gral: document.getElementById('colonia_gral').value,
+                mun_gral: document.getElementById('mun_gral').value,
+                estado_gral: document.getElementById('estado_gral').value,
+                cp_gral: document.getElementById('cp_gral').value,
+                tel_gral: document.getElementById('tel_gral').value,
+                correo_gral: document.getElementById('correo_gral').value,
+                razon_social: document.getElementById('razon_social').value,
+                calle_est: document.getElementById('calle_est').value,
+                num_est: document.getElementById('num_est').value,
+                colonia_est: document.getElementById('colonia_est').value,
+                mun_est: document.getElementById('mun_est').value,
+                estado_est: document.getElementById('estado_est').value,
+                cp_est: document.getElementById('cp_est').value,
+                tel_est: document.getElementById('tel_est').value,
+                correo_est: document.getElementById('correo_est').value,
+                latitud: lat,
+                longitud: lon,
+                enlace_mapa: lat && lon ? `https://maps.google.com/?q=${lat},${lon}` : "Sin coordenadas",
+                chk_nacional: document.getElementById('chk_nacional').checked ? "SI" : "NO",
+                chk_exportacion: document.getElementById('chk_exportacion').checked ? "SI" : "NO",
+                origen: document.getElementById('origen').value,
+                superficie: document.getElementById('superficie').value,
+                volumen: document.getElementById('volumen').value,
+                lugar_fecha: document.getElementById('lugar_fecha').value,
+                foto1: nombreArchivo('foto1'),
+                foto2: nombreArchivo('foto2'),
+                foto3: nombreArchivo('foto3'),
+                foto4: nombreArchivo('foto4'),
+                pdfBase64: pdfBase64
+            };
+
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: "POST",
+                    mode: "no-cors",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(datosCompletos)
+                });
+            } catch (e) { 
+                console.error("Error al reportar a Sheets", e); 
+            }
+        }
+
+        // --- ESTAMPAR TEXTOS Y GENERAR PDF ---
         async function llenarYDescargarPDF() {
-            // NUEVO: Mostrar la pantalla de carga inmediatamente
             const pantallaCarga = document.getElementById('pantalla-carga');
             pantallaCarga.style.display = 'flex';
             
-            // Pausa minúscula para permitir que el navegador dibuje la pantalla de carga antes de procesar
             await new Promise(resolve => setTimeout(resolve, 50));
 
             try {
@@ -353,7 +355,6 @@
                 estampar('cp_gral', 317, 485);
                 estampar('tel_gral', 455, 483);
                 
-                // Correo electrónico en minúsculas
                 const correoGral = document.getElementById('correo_gral').value.toLowerCase();
                 pagina.drawText(correoGral, { x: 170, y: 473, size: size, font: font });
 
@@ -388,7 +389,7 @@
                 // III. FECHA Y LUGAR
                 estampar('lugar_fecha', 138, 144);
 
-                // NOMBRE ABAJO DE LA FIRMA (Se copia automático del general)
+                // NOMBRE ABAJO DE LA FIRMA
                 const nombreFirma = document.getElementById('nombre_propietario').value.toUpperCase();
                 pagina.drawText(nombreFirma, { x: 130, y: 215, size: size, font: font });
 
@@ -396,12 +397,11 @@
                 const firmaImageBytes = await fetch(firmaDataUrl).then(res => res.arrayBuffer());
                 const firmaImage = await pdfDoc.embedPng(firmaImageBytes);
                 
-                // Ajusta la posición de la firma
                 pagina.drawImage(firmaImage, { x: 216, y: 199, width: 140, height: 40 });
 
                 // --- PÁGINA 2: COORDENADAS ---
-                const lat = document.getElementById('latitud').value;
-                const lon = document.getElementById('longitud').value;
+                const lat = document.getElementById('latitud').value.trim();
+                const lon = document.getElementById('longitud').value.trim();
                 
                 if (lat && lon) {
                     const page2 = pdfDoc.addPage([612, 792]); // Tamaño carta
@@ -410,19 +410,15 @@
                     page2.drawText(`Longitud: ${lon}`, { x: 50, y: 660, size: 12, font: font });
                     page2.drawText(`Puede consultar la ubicación satelital escaneando o ingresando al siguiente enlace:`, { x: 50, y: 630, size: 10, font: font });
                     
-                    const urlGoogleMaps = `https://maps.google.com/maps?q=${lat},${lon}`;
+                    const urlGoogleMaps = `https://maps.google.com/?q=${lat},${lon}`;
                     page2.drawText(urlGoogleMaps, { x: 50, y: 610, size: 10, font: font, color: PDFLib.rgb(0, 0, 1) });
 
-                    // =========================================================================
-                    // INSERTA EL MAPA EN EL PDF SIN TOCAR GOOGLE MAPS
-                    // =========================================================================
                     try {
                         const latNum = parseFloat(lat);
                         const lonNum = parseFloat(lon);
-                        const offset = 0.0025; // Define el nivel de zoom del mapa en el PDF
+                        const offset = 0.0025; 
                         const bbox = `${lonNum - offset},${latNum - offset},${lonNum + offset},${latNum + offset}`;
                         
-                        // Obtenemos una imagen estática de satélite de un servidor libre (Esri/ArcGIS)
                         const urlSatelite = `https://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/export?bbox=${bbox}&bboxSR=4326&imageSR=4326&size=450,400&format=png&f=image`;
                         
                         const imgMapaBytes = await fetch(urlSatelite).then(res => res.arrayBuffer());
@@ -431,12 +427,10 @@
                         const imgAncho = 450;
                         const imgAlto = 400;
                         const imgX = (page2.getWidth() / 2) - (imgAncho / 2);
-                        const imgY = 170; // Altura en la hoja del PDF
+                        const imgY = 170; 
 
-                        // Pegar la foto en la segunda hoja
                         page2.drawImage(imagenMapa, { x: imgX, y: imgY, width: imgAncho, height: imgAlto });
 
-                        // Dibujar manualmente el pin (Punto rojo) exactamente en el centro de la imagen
                         page2.drawCircle({
                             x: imgX + (imgAncho / 2),
                             y: imgY + (imgAlto / 2),
@@ -448,11 +442,9 @@
                     } catch (e) {
                         console.log("Aviso: No se pudo descargar la imagen satelital para el PDF.", e);
                     }
-                    // =========================================================================
                 }
 
                 // --- PÁGINA 3: ANEXO DE FOTOGRAFÍAS ---
-                // Verifica si el usuario adjuntó al menos una foto
                 const tieneFotos = document.getElementById('foto1').files.length > 0 || 
                                    document.getElementById('foto2').files.length > 0 || 
                                    document.getElementById('foto3').files.length > 0 || 
@@ -462,7 +454,6 @@
                     const page3 = pdfDoc.addPage([612, 792]);
                     page3.drawText("ANEXO 2: EVIDENCIA FOTOGRÁFICA", { x: 180, y: 740, size: 14, font: fontBold });
 
-                    // Función para procesar y estampar cada foto en la hoja 3
                     const procesarFoto = async (idInput, pagina, xPos, yPos, maxW, maxH) => {
                         const input = document.getElementById(idInput);
                         if (input && input.files.length > 0) {
@@ -489,29 +480,31 @@
                         }
                     };
 
-                    // Cuadrícula 2x2 en la Hoja 3. 
-                    // Tamaño máximo de cada foto: 250 de ancho por 280 de alto
-                    // Fila 1 (Mitad superior)
                     await procesarFoto('foto1', page3, 40, 400, 250, 280);
                     await procesarFoto('foto2', page3, 320, 400, 250, 280);
-                    
-                    // Fila 2 (Mitad inferior)
                     await procesarFoto('foto3', page3, 40, 80, 250, 280);
                     await procesarFoto('foto4', page3, 320, 80, 250, 280);
                 }
 
+                // --- FINALIZAR Y ENVIAR ---
                 const pdfBytes = await pdfDoc.save();
-                // 1. Convertir los bytes del PDF a Base64
-                const base64Pdf = btoa(
-                    new Uint8Array(pdfBytes)
-                    .reduce((data, byte) => data + String.fromCharCode(byte), '')
-            );
+                const blobPdf = new Blob([pdfBytes], { type: 'application/pdf' });
 
-                enviarAGoogleSheets(base64Pdf);
+                // Convertir a Base64 con el método infalible para archivos grandes
+                const base64Pdf = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(blobPdf);
+                    reader.onloadend = () => {
+                        resolve(reader.result.split(',')[1]); // Extraer solo la cadena base64
+                    };
+                });
 
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+                // Enviar a Google Sheets y ESPERAR a que termine antes de descargar
+                await enviarAGoogleSheets(base64Pdf);
+
+                // --- DESCARGA LOCAL ---
                 const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
+                link.href = URL.createObjectURL(blobPdf);
                 
                 const nombreDescarga = nombreFirma ? `reg_sorgo_${nombreFirma.replace(/ /g, '_')}.pdf` : `Aviso_SENASICA.pdf`;
                 link.download = nombreDescarga;
@@ -521,7 +514,7 @@
                 console.error(error);
                 alert("Hubo un error al generar el PDF. Verifica que el archivo 'formato_vacio.pdf' esté en la misma carpeta e inténtalo de nuevo.");
             } finally {
-                // NUEVO: Ocultar la pantalla de carga al terminar (ya sea con éxito o error)
+                // Ocultar la pantalla de carga sin importar qué pasó
                 pantallaCarga.style.display = 'none';
             }
         }
