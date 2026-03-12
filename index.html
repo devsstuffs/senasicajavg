@@ -366,7 +366,7 @@
                 const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
                 
                 // TAMAÑO DE FUENTE
-                const size = 7;
+                const size = 8;
 
                 const estampar = (idHTML, x, y, esCheck = false) => {
                     const el = document.getElementById(idHTML);
@@ -374,7 +374,7 @@
                     let valor = esCheck ? (el.checked ? "X" : "") : el.value.toUpperCase();
                     if (valor) {
                         // AQUÍ TODO SE IMPRIME EN NEGRITAS (font: fontBold)
-                        pagina.drawText(valor, { x: x, y: y, size: esCheck ? 10 : size, font: fontBold, color: PDFLib.rgb(0, 0, 0) });
+                        pagina.drawText(valor, { x: x, y: y, size: esCheck ? 9 : size, font: fontBold, color: PDFLib.rgb(0, 0, 0) });
                     }
                 };
 
