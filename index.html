@@ -379,14 +379,14 @@
                 };
 
                 // DATOS PDF
-                estampar('num_registro', 380, 653);
+                estampar('num_registro', 380, 649);
                 estampar('chk_verificacion', 369, 635, true);
                 estampar('chk_certificacion', 533, 635, true);
                 
                 // UNIDAD DE PRODUCCIÓN (Negritas, mayúsculas y comillas)
                 const txtUnidad = document.getElementById('unidad_produccion').value.trim().toUpperCase();
                 if (txtUnidad) {
-                    pagina.drawText(`"${txtUnidad}"`, { x: 116, y: 551, size: size, font: fontBold, color: PDFLib.rgb(0, 0, 0) });
+                    pagina.drawText(`"${txtUnidad}"`, { x: 113, y: 551, size: size, font: fontBold, color: PDFLib.rgb(0, 0, 0) });
                 }
 
                 estampar('chk_fisica', 161, 512, true);
@@ -418,7 +418,7 @@
                 pagina.drawText(correoEst, { x: 164, y: 373, size: size, font: fontBold });
 
                 const coordsStr = document.getElementById('latitud').value + ", " + document.getElementById('longitud').value;
-                if (coordsStr !== ", ") { pagina.drawText(coordsStr, { x: 261, y: 365, size: size, font: fontBold }); }
+                if (coordsStr !== ", ") { pagina.drawText(coordsStr, { x: 264, y: 354, size: size, font: fontBold }); }
                 
                 estampar('chk_nacional', 300, 335, true);
                 estampar('chk_exportacion', 391, 335, true);
@@ -433,7 +433,7 @@
                 const firmaDataUrl = canvas.toDataURL('image/png');
                 const firmaImageBytes = await fetch(firmaDataUrl).then(res => res.arrayBuffer());
                 const firmaImage = await pdfDoc.embedPng(firmaImageBytes);
-                pagina.drawImage(firmaImage, { x: 251, y: 199, width: 140, height: 40 });
+                pagina.drawImage(firmaImage, { x: 248, y: 190, width: 140, height: 40 });
 
                 // --- PÁGINA 2: COORDENADAS ---
                 const lat = document.getElementById('latitud').value.trim();
