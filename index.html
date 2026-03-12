@@ -236,7 +236,7 @@
             } else { alert("GPS no soportado en este dispositivo."); }
         }
 
-        // --- LÓGICA DE FOTOS (NUEVO) ---
+        // --- LÓGICA DE FOTOS ---
         function elegirOrigenFoto(idInput) {
             const input = document.getElementById(idInput);
             const usarCamara = confirm("¿Quieres tomar la foto con la CÁMARA ahora mismo?\n\n• Pulsa ACEPTAR para abrir la Cámara.\n• Pulsa CANCELAR para elegir de la Galería.");
@@ -363,10 +363,9 @@
                 const pages = pdfDoc.getPages();
                 const pagina = pages[0];
 
-                const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
                 const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
                 
-                // REDUCCIÓN DEL TAMAÑO DE FUENTE
+                // TAMAÑO DE FUENTE
                 const size = 7;
 
                 const estampar = (idHTML, x, y, esCheck = false) => {
@@ -374,8 +373,8 @@
                     if (!el) return;
                     let valor = esCheck ? (el.checked ? "X" : "") : el.value.toUpperCase();
                     if (valor) {
-                        // Las "X" de los checkboxes bajan a 10 para mantener proporción con la nueva fuente
-                        pagina.drawText(valor, { x: x, y: y, size: esCheck ? 10 : size, font: esCheck ? fontBold : font, color: PDFLib.rgb(0, 0, 0) });
+                        // AQUÍ TODO SE IMPRIME EN NEGRITAS (font: fontBold)
+                        pagina.drawText(valor, { x: x, y: y, size: esCheck ? 10 : size, font: fontBold, color: PDFLib.rgb(0, 0, 0) });
                     }
                 };
 
@@ -384,7 +383,7 @@
                 estampar('chk_verificacion', 372, 635, true);
                 estampar('chk_certificacion', 534, 635, true);
                 
-                // UNIDAD DE PRODUCCIÓN (Modificación especial: Negritas, mayúsculas y comillas)
+                // UNIDAD DE PRODUCCIÓN (Negritas, mayúsculas y comillas)
                 const txtUnidad = document.getElementById('unidad_produccion').value.trim().toUpperCase();
                 if (txtUnidad) {
                     pagina.drawText(`"${txtUnidad}"`, { x: 116, y: 551, size: size, font: fontBold, color: PDFLib.rgb(0, 0, 0) });
@@ -403,7 +402,8 @@
                 estampar('tel_gral', 455, 483);
                 
                 const correoGral = document.getElementById('correo_gral').value.toLowerCase();
-                pagina.drawText(correoGral, { x: 170, y: 473, size: size, font: font });
+                // Correo también en negritas
+                pagina.drawText(correoGral, { x: 170, y: 473, size: size, font: fontBold });
 
                 estampar('razon_social', 199, 428);
                 estampar('tel_est', 284, 393);
@@ -415,10 +415,10 @@
                 estampar('cp_est', 177, 394);
                 
                 const correoEst = document.getElementById('correo_est').value.toLowerCase();
-                pagina.drawText(correoEst, { x: 165, y: 383, size: size, font: font });
+                pagina.drawText(correoEst, { x: 165, y: 383, size: size, font: fontBold });
 
                 const coordsStr = document.getElementById('latitud').value + ", " + document.getElementById('longitud').value;
-                if (coordsStr !== ", ") { pagina.drawText(coordsStr, { x: 261, y: 365, size: size, font: font }); }
+                if (coordsStr !== ", ") { pagina.drawText(coordsStr, { x: 261, y: 365, size: size, font: fontBold }); }
                 
                 estampar('chk_nacional', 300, 343, true);
                 estampar('chk_exportacion', 391, 343, true);
@@ -428,7 +428,7 @@
                 estampar('lugar_fecha', 138, 144);
 
                 const nombreFirma = document.getElementById('nombre_propietario').value.toUpperCase();
-                pagina.drawText(nombreFirma, { x: 130, y: 215, size: size, font: font });
+                pagina.drawText(nombreFirma, { x: 130, y: 215, size: size, font: fontBold });
 
                 const firmaDataUrl = canvas.toDataURL('image/png');
                 const firmaImageBytes = await fetch(firmaDataUrl).then(res => res.arrayBuffer());
@@ -442,12 +442,13 @@
                 if (lat && lon) {
                     const page2 = pdfDoc.addPage([612, 792]);
                     page2.drawText("ANEXO: UBICACIÓN SATELITAL Y COORDENADAS", { x: 120, y: 720, size: 14, font: fontBold });
-                    page2.drawText(`Latitud: ${lat}`, { x: 50, y: 680, size: 12, font: font });
-                    page2.drawText(`Longitud: ${lon}`, { x: 50, y: 660, size: 12, font: font });
-                    page2.drawText(`Puede consultar la ubicación satelital escaneando o ingresando al siguiente enlace:`, { x: 50, y: 630, size: 10, font: font });
+                    // Textos de coordenadas también en negritas
+                    page2.drawText(`Latitud: ${lat}`, { x: 50, y: 680, size: 12, font: fontBold });
+                    page2.drawText(`Longitud: ${lon}`, { x: 50, y: 660, size: 12, font: fontBold });
+                    page2.drawText(`Puede consultar la ubicación satelital escaneando o ingresando al siguiente enlace:`, { x: 50, y: 630, size: 10, font: fontBold });
                     
                     const urlGoogleMaps = `https://maps.google.com/?q=${lat},${lon}`;
-                    page2.drawText(urlGoogleMaps, { x: 50, y: 610, size: 10, font: font, color: PDFLib.rgb(0, 0, 1) });
+                    page2.drawText(urlGoogleMaps, { x: 50, y: 610, size: 10, font: fontBold, color: PDFLib.rgb(0, 0, 1) });
 
                     try {
                         const latNum = parseFloat(lat);
@@ -470,7 +471,7 @@
                     } catch (e) { console.log("Aviso: No se pudo descargar la imagen satelital", e); }
                 }
 
-                // --- PÁGINA 3: ANEXO DE FOTOGRAFÍAS (CON COMPRESIÓN) ---
+                // --- PÁGINA 3: ANEXO DE FOTOGRAFÍAS ---
                 const tieneFotos = document.getElementById('foto1').files.length > 0 || 
                                    document.getElementById('foto2').files.length > 0 || 
                                    document.getElementById('foto3').files.length > 0 || 
