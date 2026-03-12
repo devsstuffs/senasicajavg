@@ -433,7 +433,7 @@
                 const firmaDataUrl = canvas.toDataURL('image/png');
                 const firmaImageBytes = await fetch(firmaDataUrl).then(res => res.arrayBuffer());
                 const firmaImage = await pdfDoc.embedPng(firmaImageBytes);
-                pagina.drawImage(firmaImage, { x: 222, y: 170, width: 140, height: 50 });
+                pagina.drawImage(firmaImage, { x: 222, y: 170, width: 160, height: 60 });
 
                 // --- PÁGINA 2: COORDENADAS ---
                 const lat = document.getElementById('latitud').value.trim();
