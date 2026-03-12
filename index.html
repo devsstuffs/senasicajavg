@@ -379,9 +379,9 @@
                 };
 
                 // DATOS PDF
-                estampar('num_registro', 380, 646);
-                estampar('chk_verificacion', 372, 635, true);
-                estampar('chk_certificacion', 534, 635, true);
+                estampar('num_registro', 380, 653);
+                estampar('chk_verificacion', 369, 635, true);
+                estampar('chk_certificacion', 533, 635, true);
                 
                 // UNIDAD DE PRODUCCIÓN (Negritas, mayúsculas y comillas)
                 const txtUnidad = document.getElementById('unidad_produccion').value.trim().toUpperCase();
@@ -389,51 +389,51 @@
                     pagina.drawText(`"${txtUnidad}"`, { x: 116, y: 551, size: size, font: fontBold, color: PDFLib.rgb(0, 0, 0) });
                 }
 
-                estampar('chk_fisica', 161, 513, true);
-                estampar('chk_moral', 270, 514, true);
+                estampar('chk_fisica', 161, 512, true);
+                estampar('chk_moral', 270, 512, true);
                 estampar('rfc', 321, 513);
                 estampar('nombre_propietario', 311, 503);
-                estampar('calle_gral', 169, 493);
-                estampar('num_gral', 306, 494);
-                estampar('colonia_gral', 475, 494);
-                estampar('mun_gral', 121, 483);
-                estampar('estado_gral', 231, 484);
-                estampar('cp_gral', 317, 485);
-                estampar('tel_gral', 455, 483);
+                estampar('calle_gral', 169, 494);
+                estampar('num_gral', 356, 492);
+                estampar('colonia_gral', 186, 483);
+                estampar('mun_gral', 366, 483);
+                estampar('estado_gral', 126, 475);
+                estampar('cp_gral', 332, 474);
+                estampar('tel_gral', 460, 473);
                 
                 const correoGral = document.getElementById('correo_gral').value.toLowerCase();
                 // Correo también en negritas
-                pagina.drawText(correoGral, { x: 170, y: 473, size: size, font: fontBold });
+                pagina.drawText(correoGral, { x: 182, y: 466, size: size, font: fontBold });
 
-                estampar('razon_social', 199, 428);
-                estampar('tel_est', 284, 393);
-                estampar('calle_est', 100, 402);
-                estampar('num_est', 221, 402);
-                estampar('colonia_est', 379, 402);
-                estampar('mun_est', 489, 403);
-                estampar('estado_est', 99, 393);
-                estampar('cp_est', 177, 394);
+                estampar('razon_social', 199, 418);
+                estampar('tel_est', 490, 383);
+                estampar('calle_est', 92, 393);
+                estampar('num_est', 289, 394);
+                estampar('colonia_est', 432, 394);
+                estampar('mun_est', 111, 383);
+                estampar('estado_est', 285, 383);
+                estampar('cp_est', 388, 383);
                 
                 const correoEst = document.getElementById('correo_est').value.toLowerCase();
-                pagina.drawText(correoEst, { x: 165, y: 383, size: size, font: fontBold });
+                pagina.drawText(correoEst, { x: 164, y: 373, size: size, font: fontBold });
 
                 const coordsStr = document.getElementById('latitud').value + ", " + document.getElementById('longitud').value;
                 if (coordsStr !== ", ") { pagina.drawText(coordsStr, { x: 261, y: 365, size: size, font: fontBold }); }
                 
-                estampar('chk_nacional', 300, 343, true);
-                estampar('chk_exportacion', 391, 343, true);
-                estampar('origen', 227, 275);
-                estampar('superficie', 223, 261);
-                estampar('volumen', 263, 247);
-                estampar('lugar_fecha', 138, 144);
+                estampar('chk_nacional', 300, 335, true);
+                estampar('chk_exportacion', 391, 335, true);
+                estampar('origen', 227, 266);
+                estampar('superficie', 223, 253);
+                estampar('volumen', 263, 237);
+                estampar('lugar_fecha', 138, 132);
 
                 const nombreFirma = document.getElementById('nombre_propietario').value.toUpperCase();
-                pagina.drawText(nombreFirma, { x: 130, y: 215, size: size, font: fontBold });
+                pagina.drawText(nombreFirma, { x: 130, y: 205, size: size, font: fontBold });
 
                 const firmaDataUrl = canvas.toDataURL('image/png');
                 const firmaImageBytes = await fetch(firmaDataUrl).then(res => res.arrayBuffer());
                 const firmaImage = await pdfDoc.embedPng(firmaImageBytes);
-                pagina.drawImage(firmaImage, { x: 216, y: 199, width: 140, height: 40 });
+                pagina.drawImage(firmaImage, { x: 251, y: 199, width: 140, height: 40 });
 
                 // --- PÁGINA 2: COORDENADAS ---
                 const lat = document.getElementById('latitud').value.trim();
