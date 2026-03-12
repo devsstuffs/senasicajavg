@@ -428,12 +428,12 @@
                 estampar('lugar_fecha', 138, 132);
 
                 const nombreFirma = document.getElementById('nombre_propietario').value.toUpperCase();
-                pagina.drawText(nombreFirma, { x: 223, y: 156, size: size, font: fontBold });
+                pagina.drawText(nombreFirma, { x: 227, y: 156, size: size, font: fontBold });
 
                 const firmaDataUrl = canvas.toDataURL('image/png');
                 const firmaImageBytes = await fetch(firmaDataUrl).then(res => res.arrayBuffer());
                 const firmaImage = await pdfDoc.embedPng(firmaImageBytes);
-                pagina.drawImage(firmaImage, { x: 222, y: 170, width: 160, height: 60 });
+                pagina.drawImage(firmaImage, { x: 222, y: 160, width: 160, height: 60 });
 
                 // --- PÁGINA 2: COORDENADAS ---
                 const lat = document.getElementById('latitud').value.trim();
