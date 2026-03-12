@@ -141,23 +141,23 @@
             
             <div class="fila">
                 <div>
-                    <input type="file" id="foto1" accept="image/*" capture="environment" style="display: none;" onchange="document.getElementById('lbl-foto1').innerText = '✅ Foto 1 capturada'; document.getElementById('lbl-foto1').style.backgroundColor = '#27ae60';">
-                    <label for="foto1" id="lbl-foto1" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📷 Tomar Fotografía 1</label>
+                    <input type="file" id="foto1" accept="image/*" style="display: none;" onchange="actualizarBotonFoto('foto1', 'btn-foto1', 1)">
+                    <div id="btn-foto1" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" onclick="elegirOrigenFoto('foto1')">📷 Añadir Fotografía 1</div>
                 </div>
                 <div>
-                    <input type="file" id="foto2" accept="image/*" capture="environment" style="display: none;" onchange="document.getElementById('lbl-foto2').innerText = '✅ Foto 2 capturada'; document.getElementById('lbl-foto2').style.backgroundColor = '#27ae60';">
-                    <label for="foto2" id="lbl-foto2" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📷 Tomar Fotografía 2</label>
+                    <input type="file" id="foto2" accept="image/*" style="display: none;" onchange="actualizarBotonFoto('foto2', 'btn-foto2', 2)">
+                    <div id="btn-foto2" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" onclick="elegirOrigenFoto('foto2')">📷 Añadir Fotografía 2</div>
                 </div>
             </div>
             
             <div class="fila" style="margin-top: 10px;">
                 <div>
-                    <input type="file" id="foto3" accept="image/*" capture="environment" style="display: none;" onchange="document.getElementById('lbl-foto3').innerText = '✅ Foto 3 capturada'; document.getElementById('lbl-foto3').style.backgroundColor = '#27ae60';">
-                    <label for="foto3" id="lbl-foto3" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📷 Tomar Fotografía 3</label>
+                    <input type="file" id="foto3" accept="image/*" style="display: none;" onchange="actualizarBotonFoto('foto3', 'btn-foto3', 3)">
+                    <div id="btn-foto3" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" onclick="elegirOrigenFoto('foto3')">📷 Añadir Fotografía 3</div>
                 </div>
                 <div>
-                    <input type="file" id="foto4" accept="image/*" capture="environment" style="display: none;" onchange="document.getElementById('lbl-foto4').innerText = '✅ Foto 4 capturada'; document.getElementById('lbl-foto4').style.backgroundColor = '#27ae60';">
-                    <label for="foto4" id="lbl-foto4" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📷 Tomar Fotografía 4</label>
+                    <input type="file" id="foto4" accept="image/*" style="display: none;" onchange="actualizarBotonFoto('foto4', 'btn-foto4', 4)">
+                    <div id="btn-foto4" style="background-color: #e67e22; color: white; padding: 12px; text-align: center; border-radius: 5px; cursor: pointer; display: block; font-weight: bold; font-size: 14px; margin-top: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" onclick="elegirOrigenFoto('foto4')">📷 Añadir Fotografía 4</div>
                 </div>
             </div>
         </div>
@@ -236,8 +236,29 @@
             } else { alert("GPS no soportado en este dispositivo."); }
         }
 
-        // --- COMPRESOR DE IMÁGENES (NUEVO) ---
-        // Esto reduce el peso de las fotos de la cámara para que el PDF suba sin problemas
+        // --- LÓGICA DE FOTOS (NUEVO) ---
+        function elegirOrigenFoto(idInput) {
+            const input = document.getElementById(idInput);
+            const usarCamara = confirm("¿Quieres tomar la foto con la CÁMARA ahora mismo?\n\n• Pulsa ACEPTAR para abrir la Cámara.\n• Pulsa CANCELAR para elegir de la Galería.");
+            
+            if (usarCamara) {
+                input.setAttribute("capture", "environment");
+            } else {
+                input.removeAttribute("capture");
+            }
+            input.click();
+        }
+
+        function actualizarBotonFoto(idInput, idBoton, numFoto) {
+            const input = document.getElementById(idInput);
+            const boton = document.getElementById(idBoton);
+            if (input.files.length > 0) {
+                boton.innerText = `✅ Foto ${numFoto} lista`;
+                boton.style.backgroundColor = '#27ae60';
+            }
+        }
+
+        // --- COMPRESOR DE IMÁGENES ---
         const comprimirImagen = (file, maxWidth = 800) => {
             return new Promise((resolve) => {
                 const reader = new FileReader();
@@ -252,7 +273,6 @@
                         const ctxComp = canvasComp.getContext('2d');
                         ctxComp.drawImage(img, 0, 0, canvasComp.width, canvasComp.height);
                         
-                        // Devuelve un JPG comprimido al 60% de calidad
                         const dataUrl = canvasComp.toDataURL('image/jpeg', 0.6);
                         resolve(dataUrl);
                     };
@@ -345,14 +365,17 @@
 
                 const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
                 const fontBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
-                const size = 9;
+                
+                // REDUCCIÓN DEL TAMAÑO DE FUENTE
+                const size = 7;
 
                 const estampar = (idHTML, x, y, esCheck = false) => {
                     const el = document.getElementById(idHTML);
                     if (!el) return;
                     let valor = esCheck ? (el.checked ? "X" : "") : el.value.toUpperCase();
                     if (valor) {
-                        pagina.drawText(valor, { x: x, y: y, size: esCheck ? 12 : size, font: esCheck ? fontBold : font, color: PDFLib.rgb(0, 0, 0) });
+                        // Las "X" de los checkboxes bajan a 10 para mantener proporción con la nueva fuente
+                        pagina.drawText(valor, { x: x, y: y, size: esCheck ? 10 : size, font: esCheck ? fontBold : font, color: PDFLib.rgb(0, 0, 0) });
                     }
                 };
 
@@ -360,7 +383,13 @@
                 estampar('num_registro', 380, 646);
                 estampar('chk_verificacion', 372, 635, true);
                 estampar('chk_certificacion', 534, 635, true);
-                estampar('unidad_produccion', 116, 551);
+                
+                // UNIDAD DE PRODUCCIÓN (Modificación especial: Negritas, mayúsculas y comillas)
+                const txtUnidad = document.getElementById('unidad_produccion').value.trim().toUpperCase();
+                if (txtUnidad) {
+                    pagina.drawText(`"${txtUnidad}"`, { x: 116, y: 551, size: size, font: fontBold, color: PDFLib.rgb(0, 0, 0) });
+                }
+
                 estampar('chk_fisica', 161, 513, true);
                 estampar('chk_moral', 270, 514, true);
                 estampar('rfc', 321, 513);
@@ -456,14 +485,10 @@
                         if (input && input.files.length > 0) {
                             try {
                                 const file = input.files[0];
-                                // USAMOS LA FUNCIÓN COMPRESORA AQUÍ
                                 const dataUrlComprimida = await comprimirImagen(file);
                                 const base64Data = dataUrlComprimida.split(',')[1];
                                 
-                                // Convertimos el base64 comprimido a un arreglo de bytes para el PDF
                                 const imgBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
-                                
-                                // Como la compresora siempre devuelve JPEG, usamos embedJpg
                                 const imgDoc = await pdfDoc.embedJpg(imgBytes);
                                 
                                 if (imgDoc) {
